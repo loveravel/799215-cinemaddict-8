@@ -1,15 +1,19 @@
-export default () => {
+/*
+* Набор экспортируемых значений
+* */
+
+export default (title, rating, date, duration, genre, poster, description, comments) => {
   return `<article class="film-card">
-          <h3 class="film-card__title">Incredibles 2</h3>
-          <p class="film-card__rating">9.8</p>
+          <h3 class="film-card__title">${title}</h3>
+          <p class="film-card__rating">${rating}</p>
           <p class="film-card__info">
-            <span class="film-card__year">2018</span>
-            <span class="film-card__duration">1h&nbsp;13m</span>
-            <span class="film-card__genre">Comedy</span>
+            <span class="film-card__year">${date}</span>
+            <span class="film-card__duration">${duration}</span>
+            <span class="film-card__genre">${genre}</span>
           </p>
-          <img src="./images/posters/moonrise.jpg" alt="" class="film-card__poster">
-          <p class="film-card__description">A priests Romania and confront a malevolent force in the form of a demonic nun.</p>
-          <button class="film-card__comments">13 comments</button>
+          <img src="./images/posters/${poster}.jpg" alt="" class="film-card__poster">
+          <p class="film-card__description">${description}</p>
+          <button class="film-card__comments">${comments}</button>
 
           <form class="film-card__controls">
             <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
