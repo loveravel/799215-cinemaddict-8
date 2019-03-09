@@ -26,7 +26,6 @@ export const cardData = () => {
     ],
     rating: (Math.random() * 10).toFixed(2),
     date: new Date().getFullYear() - tools.getRandomInteger(0, 60),
-    duration: (Math.random() * 3).toFixed(2),
     genres: new Set([
       `thriller`,
       `horror`,
@@ -66,6 +65,12 @@ export const cardData = () => {
     },
     get comment() {
       return this.comments[tools.getRandomInteger(0, this.comments.length - 1)];
+    },
+    get duration() {
+      const hours = tools.getRandomInteger(1, 3);
+      let minutes = tools.getRandomInteger(0, 59);
+      minutes = minutes < 10 ? `${0 + minutes.toString()}` : `${minutes.toString()}`;
+      return hours + `:` + minutes;
     },
   };
 };
