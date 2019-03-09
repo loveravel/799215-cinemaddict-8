@@ -14,7 +14,7 @@ const SENTENCES_FOR_DESCRIPTION = `Lorem ipsum dolor sit amet, consectetur adipi
 * Тело модуля
 * */
 
-export const cardData = () => {
+export const createCardData = () => {
   return {
     titles: [
       `Accused`,

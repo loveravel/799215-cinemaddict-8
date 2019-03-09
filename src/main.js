@@ -52,15 +52,7 @@ const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .film
 const renderFilms = (container, amount) => {
 
   for (let i = 0; i < amount; i++) {
-    const cardData = data.cardData();
-    const card = makeCard(cardData.title,
-        cardData.rating,
-        cardData.date,
-        cardData.duration,
-        cardData.genre,
-        cardData.poster,
-        cardData.description,
-        cardData.comment);
+    const card = makeCard(data.createCardData());
     container.insertAdjacentHTML(`beforeend`, card);
   }
 };
