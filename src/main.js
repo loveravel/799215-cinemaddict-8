@@ -57,7 +57,7 @@ const renderFilms = (container, amount) => {
         cardData.rating,
         cardData.date,
         cardData.duration,
-        cardData.genres,
+        cardData.genre,
         cardData.poster,
         cardData.description,
         cardData.comment);
