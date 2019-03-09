@@ -50,18 +50,17 @@ const filmsContainer = document.querySelector(`.films-list .films-list__containe
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
 
 const renderFilms = (container, amount) => {
-  const genres = Array.from(data.card.genre);
-  const posters = Array.from(data.card.poster);
 
   for (let i = 0; i < amount; i++) {
-    const card = makeCard(data.card.title[tools.getRandomInteger(0, data.card.title.length - 1)],
-        data.card.rating[tools.getRandomInteger(0, data.card.rating.length - 1)],
-        data.card.date - tools.getRandomInteger(0, 30),
-        data.card.duration[tools.getRandomInteger(0, data.card.duration.length - 1)],
-        genres[tools.getRandomInteger(0, genres.length - 1)],
-        posters[tools.getRandomInteger(0, posters.length - 1)],
-        data.card.description[tools.getRandomInteger(0, data.card.description.length - 1)],
-        data.card.comments[tools.getRandomInteger(0, data.card.comments.length - 1)]);
+    const cardData = data.cardData();
+    const card = makeCard(cardData.title,
+        cardData.rating,
+        cardData.date,
+        cardData.duration,
+        cardData.genres,
+        cardData.poster,
+        cardData.description,
+        cardData.comment);
     container.insertAdjacentHTML(`beforeend`, card);
   }
 };

@@ -14,53 +14,58 @@ const SENTENCES_FOR_DESCRIPTION = `Lorem ipsum dolor sit amet, consectetur adipi
 * Тело модуля
 * */
 
-export const card = {
-  title: [
-    `Accused`,
-    `Blackmail`,
-    `Blue Blazes`,
-    `Fuga Da New York`,
-    `Moonrise`,
-    `Three Friends`,
-  ],
-  rating: [
-    (Math.random() * 10).toFixed(2),
-    (Math.random() * 10).toFixed(2),
-    (Math.random() * 10).toFixed(2),
-    (Math.random() * 10).toFixed(2),
-    (Math.random() * 10).toFixed(2),
-    (Math.random() * 10).toFixed(2),
-  ],
-  date: new Date().getFullYear(),
-  duration: [
-    (Math.random() * 3).toFixed(2),
-    (Math.random() * 3).toFixed(2),
-    (Math.random() * 3).toFixed(2),
-    (Math.random() * 3).toFixed(2),
-    (Math.random() * 3).toFixed(2),
-    (Math.random() * 3).toFixed(2),
-  ],
-  genre: new Set([
-    `thriller`,
-    `horror`,
-    `drama`,
-    `melodrama`,
-    `western`,
-    `comedy`,
-    `action`,
-    `science`,
-    `fiction`,
-    `fantasy`,
-    `musical`,
-  ]),
-  poster: new Set([
-    `accused`,
-    `blackmail`,
-    `blue-blazes`,
-    `fuga-da-new-york`,
-    `moonrise`,
-    `three-friends`,
-  ]),
-  description: SENTENCES_FOR_DESCRIPTION.split(`. `),
-  comments: SENTENCES_FOR_DESCRIPTION.split(`. `),
+export const cardData = () => {
+  return {
+    titles: [
+      `Accused`,
+      `Blackmail`,
+      `Blue Blazes`,
+      `Fuga Da New York`,
+      `Moonrise`,
+      `Three Friends`,
+    ],
+    rating: (Math.random() * 10).toFixed(2),
+    date: new Date().getFullYear() - tools.getRandomInteger(0, 60),
+    duration: (Math.random() * 3).toFixed(2),
+    genres: new Set([
+      `thriller`,
+      `horror`,
+      `drama`,
+      `melodrama`,
+      `western`,
+      `comedy`,
+      `action`,
+      `science`,
+      `fiction`,
+      `fantasy`,
+      `musical`,
+    ]),
+    posters: new Set([
+      `accused`,
+      `blackmail`,
+      `blue-blazes`,
+      `fuga-da-new-york`,
+      `moonrise`,
+      `three-friends`,
+    ]),
+    descriptions: SENTENCES_FOR_DESCRIPTION.split(`. `),
+    comments: SENTENCES_FOR_DESCRIPTION.split(`. `),
+    get title() {
+      return this.titles[tools.getRandomInteger(0, this.titles.length - 1)];
+    },
+    get genre() {
+      const genres = Array.from(this.genres);
+      return genres[tools.getRandomInteger(0, genres.length - 1)];
+    },
+    get poster() {
+      const posters = Array.from(this.posters);
+      return posters[tools.getRandomInteger(0, posters.length - 1)];
+    },
+    get description() {
+      return this.descriptions[tools.getRandomInteger(0, this.descriptions.length - 1)];
+    },
+    get comment() {
+      return this.comments[tools.getRandomInteger(0, this.comments.length - 1)];
+    },
+  };
 };
