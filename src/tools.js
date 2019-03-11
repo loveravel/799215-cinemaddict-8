@@ -10,3 +10,7 @@ export const createElement = (template) => {
   newElement.innerHTML = template;
   return newElement.firstChild;
 };
+
+export const getRandomFromArray = (array) => {
+  return array[getRandomInteger(0, array.length - 1)];
+};
