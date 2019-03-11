@@ -75,24 +75,24 @@ export const createCardData = () => {
       `England`,
     ],
     get country() {
-      return getRandomFromArray(this.countries);
+      return tools.getRandomFromArray(this.countries);
     },
     get title() {
-      return getRandomFromArray(this.titles);
+      return tools.getRandomFromArray(this.titles);
     },
     get genre() {
       const genres = Array.from(this.genres);
-      return getRandomFromArray(genres);
+      return tools.getRandomFromArray(genres);
     },
     get poster() {
       const posters = Array.from(this.posters);
-      return getRandomFromArray(posters);
+      return tools.getRandomFromArray(posters);
     },
     get description() {
-      return getRandomFromArray(this.descriptions);
+      return tools.getRandomFromArray(this.descriptions);
     },
     get comment() {
-      return getRandomFromArray(this.comments);
+      return tools.getRandomFromArray(this.comments);
     },
   };
 };
