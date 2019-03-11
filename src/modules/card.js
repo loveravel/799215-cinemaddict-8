@@ -25,7 +25,7 @@ export default class Card {
   }
 
   _onCommentsButtonClick() {
-    typeof this._onDetails === `function` && this._onDetails();
+    this._onDetails();
   }
 
   set onDetails(fn) {

@@ -26,7 +26,7 @@ export default class CardDetails {
   }
 
   _onCloseButtonClick() {
-    typeof this._onClose === `function` && this._onClose();
+    this._onClose();
   }
 
   set onClose(fn) {
