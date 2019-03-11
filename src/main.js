@@ -3,7 +3,8 @@
 * */
 
 import makeFilter from '../src/modules/make-filter.js';
-import makeCard from '../src/modules/make-card.js';
+import Card from '../src/modules/card.js';
+import CardDetails from '../src/modules/card-details.js';
 import * as tools from '../src/tools.js';
 import * as data from '../src/data.js';
 
@@ -46,29 +47,8 @@ const renderFilters = (insertionPoint, howToInsert) => {
 
 renderFilters(statsItem, `beforebegin`);
 
-const filmsContainer = document.querySelector(`.films-list .films-list__container`);
-const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
-
-const renderFilms = (container, amount) => {
-
-  for (let i = 0; i < amount; i++) {
-    const card = makeCard(data.createCardData());
-    container.insertAdjacentHTML(`beforeend`, card);
-  }
-};
-
-renderFilms(filmsContainer, DEFAULT_AMOUNT_CARDS.All);
-
-const renderFilmsExtra = (amountCards) => {
-  filmsExtraContainers.forEach((extraContainer) => {
-    renderFilms(extraContainer, amountCards);
-  });
-};
-
-renderFilmsExtra(DEFAULT_AMOUNT_CARDS.Extra);
-
-
 /* Обработка события клика по фильтру */
+
 const filterElements = document.querySelectorAll(`.main-navigation__item`);
 filterElements.forEach((filter) => {
   filter.addEventListener(`click`, () => {
@@ -85,3 +65,39 @@ filterElements.forEach((filter) => {
     renderFilmsExtra(tools.getRandomInteger(1, 4));
   });
 });
+
+
+/* Рендер карточек */
+
+const filmsContainer = document.querySelector(`.films-list .films-list__container`);
+const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
+
+const renderFilms = (container, amount) => {
+  for (let i = 0; i < amount; i++) {
+    const cardData = data.createCardData();
+    const card = new Card(cardData);
+    const cardDetails = new CardDetails(cardData);
+
+    container.appendChild(card.render());
+
+    card.onDetails = () => {
+      const cardDetailsElement = cardDetails.render();
+      document.body.appendChild(cardDetailsElement);
+
+      cardDetails.onClose = () => {
+        cardDetails.unrender();
+        document.body.removeChild(cardDetailsElement);
+      };
+    };
+  }
+};
+
+renderFilms(filmsContainer, DEFAULT_AMOUNT_CARDS.All);
+
+const renderFilmsExtra = (amountCards) => {
+  filmsExtraContainers.forEach((extraContainer) => {
+    renderFilms(extraContainer, amountCards);
+  });
+};
+
+renderFilmsExtra(DEFAULT_AMOUNT_CARDS.Extra);
