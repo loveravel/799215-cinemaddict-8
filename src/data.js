@@ -3,7 +3,7 @@
 * */
 
 import * as tools from '../src/tools.js';
-import {getRandomInteger} from "../src/tools";
+import {getRandomFromArray, getRandomInteger} from "../src/tools";
 
 /*
 * Список констант
@@ -75,24 +75,24 @@ export const createCardData = () => {
       `England`,
     ],
     get country() {
-      return this.countries[getRandomInteger(0, this.countries.length - 1)];
+      return getRandomFromArray(this.countries);
     },
     get title() {
-      return this.titles[tools.getRandomInteger(0, this.titles.length - 1)];
+      return getRandomFromArray(this.titles);
     },
     get genre() {
       const genres = Array.from(this.genres);
-      return genres[tools.getRandomInteger(0, genres.length - 1)];
+      return getRandomFromArray(genres);
     },
     get poster() {
       const posters = Array.from(this.posters);
-      return posters[tools.getRandomInteger(0, posters.length - 1)];
+      return getRandomFromArray(posters);
     },
     get description() {
-      return this.descriptions[tools.getRandomInteger(0, this.descriptions.length - 1)];
+      return getRandomFromArray(this.descriptions);
     },
     get comment() {
-      return this.comments[tools.getRandomInteger(0, this.comments.length - 1)];
+      return getRandomFromArray(this.comments);
     },
   };
 };
