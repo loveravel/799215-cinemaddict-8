@@ -4,3 +4,13 @@ export const getRandomInteger = (minimumNumber, maximumNumber) => {
   randomNumber = Math.floor(randomNumber);
   return randomNumber;
 };
+
+export const createElement = (template) => {
+  const newElement = document.createElement(`div`);
+  newElement.innerHTML = template;
+  return newElement.firstChild;
+};
+
+export const getRandomFromArray = (array) => {
+  return array[getRandomInteger(0, array.length - 1)];
+};
