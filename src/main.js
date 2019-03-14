@@ -86,7 +86,6 @@ const renderFilms = (container, amount) => {
 
       cardDetails.onClose = () => {
         cardDetails.unrender();
-        document.body.removeChild(cardDetailsElement);
       };
     };
   }
