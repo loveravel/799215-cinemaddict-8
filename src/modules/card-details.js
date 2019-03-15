@@ -2,16 +2,15 @@
 * Набор импортированный значений
 * */
 
-import * as tools from '../tools.js';
+import Component from './component';
 
 /*
 * Набор экспортируемых значений
 * */
 
-export default class CardDetails {
+export default class CardDetails extends Component {
   constructor(data) {
-    this._element = null;
-
+    super();
     this._title = data.title;
     this._rating = data.rating;
     this._userRating = data.userRating;
@@ -23,6 +22,8 @@ export default class CardDetails {
     this._country = data.country;
 
     this._onClose = null;
+
+    this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
   }
 
   _onCloseButtonClick() {
@@ -203,18 +204,13 @@ export default class CardDetails {
     </section>`.trim();
   }
 
-  render() {
-    this._element = tools.createElement(this.template);
-    this.bind();
-    return this._element;
-  }
-
   bind() {
     this._element.querySelector(`.film-details__close-btn`)
-      .addEventListener(`click`, this._onCloseButtonClick.bind(this));
+      .addEventListener(`click`, this._onCloseButtonClick);
   }
 
-  unrender() {
-    this._element = null;
+  unbind() {
+    this._element.querySelector(`.film-details__close-btn`)
+      .removeEventListener(`click`, this._onCloseButtonClick);
   }
 }

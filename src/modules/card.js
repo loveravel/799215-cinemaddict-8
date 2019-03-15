@@ -2,16 +2,15 @@
 * Набор импортированный значений
 * */
 
-import * as tools from '../tools.js';
+import Component from './component';
 
 /*
 * Набор экспортируемых значений
 * */
 
-export default class Card {
+export default class Card extends Component {
   constructor(data) {
-    this._element = null;
-
+    super();
     this._title = data.title;
     this._rating = data.rating;
     this._yearOfIssue = data.yearOfIssue;
@@ -54,12 +53,6 @@ export default class Card {
         <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
       </form>
     </article>`.trim();
-  }
-
-  render() {
-    this._element = tools.createElement(this.template);
-    this.bind();
-    return this._element;
   }
 
   bind() {
