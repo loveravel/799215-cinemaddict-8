@@ -15,6 +15,12 @@ export default class Component {
     }
 
     this._element = null;
+
+    this._state = {
+      isWatchlist: false,
+      isWatched: false,
+      isFavorite: false,
+    };
   }
 
   get element() {
@@ -39,5 +45,14 @@ export default class Component {
     this.unbind();
     this._element.remove();
     this._element = null;
+  }
+
+  update() {}
+
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+    const newElement = this._element.parentElement.insertBefore(this._element.firstChild, this._element);
+    this._element.remove();
+    this._element = newElement;
   }
 }

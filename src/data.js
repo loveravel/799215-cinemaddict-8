@@ -4,6 +4,7 @@
 
 import * as tools from '../src/tools.js';
 import {getRandomFromArray} from "../src/tools";
+import moment from "moment";
 
 /*
 * Тело модуля
@@ -133,7 +134,10 @@ const filmMakingData = {
       comments.push(comment);
     }
     return comments;
-  }
+  },
+  get date() {
+    return moment().subtract(tools.getRandomInteger(0, 60), `year`);
+  },
 };
 
 /*
@@ -143,10 +147,18 @@ const filmMakingData = {
 export const getFilmData = () => {
   return {
     title: filmMakingData.title,
-    yearOfIssue: new Date().getFullYear() - tools.getRandomInteger(0, 60),
+    date: {
+      date: filmMakingData.date,
+      get yearOfIssue() {
+        return moment(`${this.date}`).year();
+      },
+      get releaseDate() {
+        return moment(`${this.date}`).format(`DD MMMM YYYY`);
+      },
+    },
     duration: tools.getRandomInteger(10, 240),
     rating: (Math.random() * 10).toFixed(2),
-    userRating: (Math.random() * 10).toFixed(2),
+    userRating: 0,
     ageLimit: filmMakingData.ageLimits[tools.getRandomInteger(0, filmMakingData.ageLimits.length - 1)],
     comments: filmMakingData.comments,
     description: filmMakingData.description,

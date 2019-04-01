@@ -3,8 +3,8 @@
 * */
 
 import makeFilter from '../src/modules/make-filter.js';
-import Card from '../src/modules/card.js';
-import CardDetails from '../src/modules/card-details.js';
+import Film from './modules/film.js';
+import FilmDetails from './modules/film-details.js';
 import * as tools from '../src/tools.js';
 import * as data from '../src/data.js';
 
@@ -49,7 +49,7 @@ renderFilters(statsItem, `beforebegin`);
 
 /* Обработка события клика по фильтру */
 
-const filterElements = document.querySelectorAll(`.main-navigation__item`);
+const filterElements = document.querySelectorAll(`.main-navigation__item:not(.main-navigation__item--additional)`);
 filterElements.forEach((filter) => {
   filter.addEventListener(`click`, () => {
     filmsContainer.innerHTML = ``;
@@ -74,19 +74,27 @@ const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .film
 
 const renderFilms = (container, amount) => {
   for (let i = 0; i < amount; i++) {
-    const cardData = data.createCardData();
-    const card = new Card(cardData);
-    const cardDetails = new CardDetails(cardData);
+    const filmData = data.getFilmData();
+    const film = new Film(filmData);
+    const filmDetails = new FilmDetails(filmData);
 
-    container.appendChild(card.render());
+    container.appendChild(film.render());
 
-    card.onDetails = () => {
-      const cardDetailsElement = cardDetails.render();
-      document.body.appendChild(cardDetailsElement);
+    film.onDetails = () => {
+      const filmDetailsElement = filmDetails.render();
+      document.body.appendChild(filmDetailsElement);
+    };
 
-      cardDetails.onClose = () => {
-        cardDetails.unrender();
-      };
+    filmDetails.onChangeForm = (newObject) => {
+      filmData.userRating = newObject.userRating;
+      filmData.comments = newObject.comments;
+
+      filmDetails.update(filmData);
+      film.update(filmData);
+    };
+
+    filmDetails.onClose = () => {
+      filmDetails.unrender();
     };
   }
 };
