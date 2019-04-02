@@ -14,3 +14,9 @@ export const createElement = (template) => {
 export const getRandomFromArray = (array) => {
   return array[getRandomInteger(0, array.length - 1)];
 };
+
+export const getTimeFromMinutes = (minutes) => {
+  let hours = Math.trunc(minutes / 60);
+  let minutesWithoutHours = minutes % 60;
+  return hours + `h ` + minutesWithoutHours + `m`;
+};
