@@ -3,24 +3,27 @@
 * */
 
 import Component from './component';
+import * as tools from '../tools.js';
 
 /*
 * Набор экспортируемых значений
 * */
 
-export default class Card extends Component {
+export default class Film extends Component {
   constructor(data) {
     super();
     this._title = data.title;
     this._rating = data.rating;
-    this._yearOfIssue = data.yearOfIssue;
+    this._yearOfIssue = data.date.yearOfIssue;
     this._duration = data.duration;
     this._genre = data.genre;
     this._poster = data.poster;
     this._description = data.description;
-    this._comment = data.comment;
+    this._comments = data.comments;
 
     this._onDetails = null;
+
+    this._onCommentsButtonClick = this._onCommentsButtonClick.bind(this);
   }
 
   _onCommentsButtonClick() {
@@ -40,12 +43,12 @@ export default class Card extends Component {
       <p class="film-card__rating">${this._rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${this._yearOfIssue}</span>
-        <span class="film-card__duration">${this._duration} min</span>
+        <span class="film-card__duration">${tools.getTimeFromMinutes(this._duration)}</span>
         <span class="film-card__genre">${this._genre}</span>
       </p>
       <img src="./images/posters/${this._poster}.jpg" alt="" class="film-card__poster">
       <p class="film-card__description">${this._description}</p>
-      <button class="film-card__comments">${this._comment}</button>
+      <button class="film-card__comments">${this._comments.length} comments</button>
 
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
@@ -58,5 +61,18 @@ export default class Card extends Component {
   bind() {
     this._element.querySelector(`.film-card__comments`)
       .addEventListener(`click`, this._onCommentsButtonClick.bind(this));
+  }
+
+  unbind() {
+    this._element.querySelector(`.film-card__comments`)
+      .removeEventListener(`click`, this._onCommentsButtonClick.bind(this));
+  }
+
+  update(data) {
+    this._comments = data.comments;
+
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
   }
 }
