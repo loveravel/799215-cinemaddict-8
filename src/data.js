@@ -168,5 +168,39 @@ export const getFilmData = () => {
     actors: filmMakingData.randomPersons(5, 10),
     country: filmMakingData.country,
     genre: filmMakingData.genre,
+    list: {
+      isWatchlist: false,
+      isWatched: false,
+      isFavorite: false,
+    }
   };
+};
+
+export const getFiltersData = () => {
+  return [
+    {
+      name: `All movies`,
+      link: `all`,
+      active: true,
+      count: 0,
+    },
+    {
+      name: `Watchlist`,
+      link: `watchlist`,
+      active: false,
+      count: tools.getRandomInteger(1, 10),
+    },
+    {
+      name: `History`,
+      link: `history`,
+      active: false,
+      count: tools.getRandomInteger(1, 10),
+    },
+    {
+      name: `Favorites`,
+      link: `favorites`,
+      active: false,
+      count: tools.getRandomInteger(1, 10),
+    },
+  ];
 };
