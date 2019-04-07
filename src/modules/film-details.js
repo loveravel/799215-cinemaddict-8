@@ -40,6 +40,7 @@ export default class FilmDetails extends Component {
     this._actors = data.actors;
     this._comments = data.comments;
     this._releaseDate = data.date.releaseDate;
+    this._list = data.list;
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
     this._onClose = null;
@@ -228,14 +229,26 @@ export default class FilmDetails extends Component {
         </div>
     
         <section class="film-details__controls">
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watchlist" name="watchlist">
-          <label for="watchlist" class="film-details__control-label film-details__control-label--watchlist">Add to watchlist</label>
+          <input type="checkbox" class="film-details__control-input visually-hidden"
+            id="watchlist" name="watchlist" ${this._list.isWatchlist ? `checked` : ``}>
+          <label for="watchlist"
+            class="film-details__control-label film-details__control-label--watchlist">
+            Add to watchlist
+          </label>
     
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="watched" name="watched" checked>
-          <label for="watched" class="film-details__control-label film-details__control-label--watched">Already watched</label>
+          <input type="checkbox" class="film-details__control-input visually-hidden"
+            id="watched" name="watched" ${this._list.isWatched ? `checked` : ``}>
+          <label for="watched"
+            class="film-details__control-label film-details__control-label--watched">
+            Already watched
+          </label>
     
-          <input type="checkbox" class="film-details__control-input visually-hidden" id="favorite" name="favorite">
-          <label for="favorite" class="film-details__control-label film-details__control-label--favorite">Add to favorites</label>
+          <input type="checkbox" class="film-details__control-input visually-hidden"
+            id="favorite" name="favorite" ${this._list.isFavorite ? `checked` : ``}>
+          <label for="favorite"
+            class="film-details__control-label film-details__control-label--favorite">
+            Add to favorites
+          </label>
         </section>
     
         <section class="film-details__comments-wrap">
@@ -327,7 +340,15 @@ export default class FilmDetails extends Component {
       .removeEventListener(`keydown`, this._onCommentPosting);
   }
 
+  _partialUpdate() {
+    this._element.innerHTML = this.template;
+    const newElement = this._element.parentElement.insertBefore(this._element.firstChild, this._element);
+    this._element.remove();
+    this._element = newElement;
+  }
+
   update(data) {
     this._userRating = data.userRating;
+    this._list = data.list;
   }
 }

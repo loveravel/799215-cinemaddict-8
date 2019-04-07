@@ -2,81 +2,43 @@
 * Набор импортированный значений
 * */
 
-import makeFilter from '../src/modules/make-filter.js';
 import Film from './modules/film.js';
 import FilmDetails from './modules/film-details.js';
-import * as tools from '../src/tools.js';
-import * as data from '../src/data.js';
-
-/*
-* Список констант
-* */
-
-const DEFAULT_AMOUNT_CARDS = {
-  All: 7,
-  Extra: 2,
-};
-
-const FILTERS = new Map([
-  [`all`, `All movies`],
-  [`watchlist`, `Watchlist`],
-  [`history`, `History`],
-  [`favorites`, `Favorites`],
-]);
+import Filter from './modules/filter.js';
+import * as data from './data.js';
+import renderStatistic from './modules/statistic.js';
 
 /*
 * Тело модуля
 * */
 
-const statsItem = document.querySelector(`.main-navigation__item--additional`);
+/*
+* Фильмы
+* */
 
-const renderFilters = (insertionPoint, howToInsert) => {
-  let amountFilms;
-  let active = false;
-  FILTERS.forEach((name, link) => {
-    if (link === `all`) {
-      active = true;
-    } else {
-      amountFilms = tools.getRandomInteger(0, 10);
-    }
-    const filter = makeFilter(link, name, amountFilms, active);
-    insertionPoint.insertAdjacentHTML(howToInsert, filter);
-    active = false;
-  });
+const DefaultNumberOfFilms = {
+  ALL: 7,
+  EXTRA: 2,
 };
 
-renderFilters(statsItem, `beforebegin`);
+const getFilmsData = (amount) => {
+  const films = [];
+  for (let i = 0; i < amount; i++) {
+    films.push(data.getFilmData());
+  }
+  return films;
+};
 
-/* Обработка события клика по фильтру */
-
-const filterElements = document.querySelectorAll(`.main-navigation__item:not(.main-navigation__item--additional)`);
-filterElements.forEach((filter) => {
-  filter.addEventListener(`click`, () => {
-    filmsContainer.innerHTML = ``;
-    filmsExtraContainers.forEach((extraContainer) => {
-      extraContainer.innerHTML = ``;
-    });
-
-    document.querySelector(`.main-navigation__item--active`).
-    classList.remove(`main-navigation__item--active`);
-    filter.classList.add(`main-navigation__item--active`);
-
-    renderFilms(filmsContainer, tools.getRandomInteger(1, 10));
-    renderFilmsExtra(tools.getRandomInteger(1, 4));
-  });
-});
-
-
-/* Рендер карточек */
+const initialFilmsData = getFilmsData(DefaultNumberOfFilms.ALL);
 
 const filmsContainer = document.querySelector(`.films-list .films-list__container`);
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
 
-const renderFilms = (container, amount) => {
-  for (let i = 0; i < amount; i++) {
-    const filmData = data.getFilmData();
-    const film = new Film(filmData);
-    const filmDetails = new FilmDetails(filmData);
+const renderFilms = (container, filmsData) => {
+  container.innerHTML = ``;
+  for (let i = 0; i < filmsData.length; i++) {
+    const film = new Film(filmsData[i]);
+    const filmDetails = new FilmDetails(filmsData[i]);
 
     container.appendChild(film.render());
 
@@ -85,12 +47,27 @@ const renderFilms = (container, amount) => {
       document.body.appendChild(filmDetailsElement);
     };
 
-    filmDetails.onChangeForm = (newObject) => {
-      filmData.userRating = newObject.userRating;
-      filmData.comments = newObject.comments;
+    film.onAddToWatchlist = () => {
+      filmsData[i].list.isWatchlist = !filmsData[i].list.isWatchlist;
+      filmDetails.update(filmsData[i]);
+    };
 
-      filmDetails.update(filmData);
-      film.update(filmData);
+    film.onMarkAsWatched = () => {
+      filmsData[i].list.isWatched = !filmsData[i].list.isWatched;
+      filmDetails.update(filmsData[i]);
+    };
+
+    film.onMarkAsFavorite = () => {
+      filmsData[i].list.isFavorite = !filmsData[i].list.isFavorite;
+      filmDetails.update(filmsData[i]);
+    };
+
+    filmDetails.onChangeForm = (newObject) => {
+      filmsData[i].userRating = newObject.userRating;
+      filmsData[i].comments = newObject.comments;
+
+      filmDetails.update(filmsData[i]);
+      film.update(filmsData[i]);
     };
 
     filmDetails.onClose = () => {
@@ -99,12 +76,78 @@ const renderFilms = (container, amount) => {
   }
 };
 
-renderFilms(filmsContainer, DEFAULT_AMOUNT_CARDS.All);
+renderFilms(filmsContainer, initialFilmsData);
 
-const renderFilmsExtra = (amountCards) => {
+const renderFilmsExtra = (filmsData) => {
   filmsExtraContainers.forEach((extraContainer) => {
-    renderFilms(extraContainer, amountCards);
+    renderFilms(extraContainer, filmsData);
   });
 };
 
-renderFilmsExtra(DEFAULT_AMOUNT_CARDS.Extra);
+renderFilmsExtra(initialFilmsData.slice(0, DefaultNumberOfFilms.EXTRA));
+
+/*
+* Фильтры
+* */
+
+const filtersContainer = document.querySelector(`.main-navigation`);
+const statisticItem = document.querySelector(`.main-navigation__item--additional`);
+
+const doFilmsFiltering = (films, filterName) => {
+  switch (filterName) {
+    case `all movies`:
+      return films;
+
+    case `watchlist`:
+      return films.filter((it) => it.list.isWatchlist);
+
+    case `history`:
+      return films.filter((it) => it.list.isWatched);
+
+    case `favorites`:
+      return films.filter((it) => it.list.isFavorite);
+
+    default: return films;
+  }
+};
+
+const renderFilters = (container, insertionPoint) => {
+  const filtersData = data.getFiltersData();
+  filtersData.forEach((filterData) => {
+    const filter = new Filter(filterData);
+
+    container.insertBefore(filter.render(), insertionPoint);
+
+    filter.onClick = () => {
+      const filterActive = document.querySelector(`.main-navigation__item--active`);
+      if (filterActive) {
+        filterActive.classList.remove(`main-navigation__item--active`);
+      }
+      filter.element.classList.add(`main-navigation__item--active`);
+      statisticBlock.classList.add(`visually-hidden`);
+      filmsBlock.classList.remove(`visually-hidden`);
+      const filteredFilms = doFilmsFiltering(initialFilmsData, filter.name.toLowerCase());
+      renderFilms(filmsContainer, filteredFilms);
+    };
+  });
+};
+
+renderFilters(filtersContainer, statisticItem);
+
+/*
+* Статистика
+* */
+
+const statisticBlock = document.querySelector(`.statistic`);
+const filmsBlock = document.querySelector(`.films`);
+
+const onStatsItemClick = () => {
+  statisticBlock.classList.remove(`visually-hidden`);
+  filmsBlock.classList.add(`visually-hidden`);
+  renderStatistic(initialFilmsData);
+  const activeFilter = document.querySelector(`.main-navigation__item--active`);
+  activeFilter.classList.remove(`main-navigation__item--active`);
+  statisticItem.classList.add(`main-navigation__item--active`);
+};
+
+statisticItem.addEventListener(`click`, onStatsItemClick);
