@@ -48,11 +48,4 @@ export default class Component {
   }
 
   update() {}
-
-  _partialUpdate() {
-    this._element.innerHTML = this.template;
-    const newElement = this._element.parentElement.insertBefore(this._element.firstChild, this._element);
-    this._element.remove();
-    this._element = newElement;
-  }
 }
