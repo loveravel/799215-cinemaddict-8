@@ -2,9 +2,24 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import * as tools from '../tools.js';
 
+const RANK_MIN_VALUE = new Map([
+  [`Movie Buff`, 20],
+  [`Fan`, 11],
+  [`Novice`, 1],
+]);
+
 const statisticBlock = document.querySelector(`.statistic`);
 
-const getTemplateStatistic = (filmsData, mostPopularGenre) => {
+const getTemplateStatistic = (filmsData, mostPopularGenre, watchedFilms) => {
+
+  const getRank = () => {
+    for (const rank of RANK_MIN_VALUE) {
+      if (rank[1] < watchedFilms.length) {
+        return rank[0];
+      }
+    }
+    return `You did not watch movies`;
+  };
 
   let totalDuration = 0;
   if (filmsData.length) {
@@ -15,7 +30,7 @@ const getTemplateStatistic = (filmsData, mostPopularGenre) => {
   }
 
   return `
-    <p class="statistic__rank">Your rank <span class="statistic__rank-label">Sci-Fighter</span></p>
+    <p class="statistic__rank">Your rank <span class="statistic__rank-label">${getRank()}</span></p>
   
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters visually-hidden">
       <p class="statistic__filters-description">Show stats:</p>
@@ -145,6 +160,6 @@ export default (films) => {
   let arrayValues = Object.values(resultGenres);
   let mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
 
-  statisticBlock.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre);
+  statisticBlock.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre, watchedFilms);
   drawChart(resultGenres);
 };
