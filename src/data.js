@@ -204,5 +204,11 @@ export const getFiltersData = (films) => {
       active: false,
       count: films.length,
     },
+    {
+      name: `Stats`,
+      link: `stats`,
+      active: false,
+      count: 0,
+    },
   ];
 };

@@ -128,7 +128,7 @@ const drawChart = (genres) => {
 };
 
 export default (films) => {
-  const watchedFilms = films.filter((it) => it.list.isWatched);
+  const watchedFilms = films.filter((it) => it.isWatched);
 
   let totalGenres = [];
   if (watchedFilms.length) {

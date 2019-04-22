@@ -13,7 +13,7 @@ import renderStatistic from './modules/statistic.js';
 * Набор констант
 * */
 
-const AUTHORIZATION = `Basic sdfkjXjkl324X`;
+const AUTHORIZATION = `Basic sdfkjXjkl324X=1234f`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 
 /*
@@ -22,16 +22,11 @@ const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
+let amountFilms = 5;
+
 /*
 * Фильмы
 * */
-
-const DefaultNumberOfFilms = {
-  ALL: 7,
-  EXTRA: 2,
-};
-
-const initialFilmsData = [];
 
 const mainFilmsContainer = document.querySelector(`.films-list .films-list__container`);
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
@@ -79,14 +74,6 @@ const renderFilms = (container, filmsData) => {
   }
 };
 
-const renderFilmsExtra = (filmsData) => {
-  filmsExtraContainers.forEach((extraContainer) => {
-    renderFilms(extraContainer, filmsData);
-  });
-};
-
-renderFilmsExtra(initialFilmsData.slice(0, DefaultNumberOfFilms.EXTRA));
-
 /*
 * Фильтры
 * */
@@ -112,12 +99,27 @@ const doFilmsFiltering = (films, filterName) => {
   }
 };
 
-const renderFilters = (container, films, insertionPoint) => {
+const renderFilters = (container, films) => {
   const filtersData = data.getFiltersData(films);
   filtersData.forEach((filterData) => {
     const filter = new Filter(filterData);
 
-    container.insertBefore(filter.render(), insertionPoint);
+    container.appendChild(filter.render());
+
+    if (filter.name === `Stats`) {
+      filter.element.classList.add(`main-navigation__item--additional`);
+
+      const onStatsItemClick = () => {
+        statisticBlock.classList.remove(`visually-hidden`);
+        filmsBlock.classList.add(`visually-hidden`);
+        renderStatistic(films);
+        const activeFilter = document.querySelector(`.main-navigation__item--active`);
+        activeFilter.classList.remove(`main-navigation__item--active`);
+        filter.element.classList.add(`main-navigation__item--active`);
+      };
+
+      filter.element.addEventListener(`click`, onStatsItemClick);
+    }
 
     filter.onClick = () => {
       const filterActive = document.querySelector(`.main-navigation__item--active`);
@@ -136,11 +138,11 @@ const renderFilters = (container, films, insertionPoint) => {
 const renderFilmsByCategory = (films) => {
   const topFilms = films.sort((prevFilm, nextFilm) => {
     return nextFilm.rating - prevFilm.rating;
-  }).splice(0, 2);
+  }).slice(0, 2);
 
   const mostFilms = films.sort((prevFilm, nextFilm) => {
     return nextFilm.comments.length - prevFilm.comments.length;
-  }).splice(0, 2);
+  }).slice(0, 2);
 
   let mainFilms = films;
 
@@ -163,8 +165,6 @@ const renderFilmsByCategory = (films) => {
     }
   };
   showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
-
-  films.push(...topFilms, ...mostFilms);
 };
 
 /*
@@ -174,28 +174,14 @@ const renderFilmsByCategory = (films) => {
 const statisticBlock = document.querySelector(`.statistic`);
 const filmsBlock = document.querySelector(`.films`);
 
-const onStatsItemClick = (films) => {
-  statisticBlock.classList.remove(`visually-hidden`);
-  filmsBlock.classList.add(`visually-hidden`);
-  renderStatistic(films);
-  const activeFilter = document.querySelector(`.main-navigation__item--active`);
-  activeFilter.classList.remove(`main-navigation__item--active`);
-  statisticItem.classList.add(`main-navigation__item--active`);
-};
-
-statisticItem.addEventListener(`click`, onStatsItemClick);
-
-
 /*
 * Render
 * */
 
-let amountFilms = 5;
-
 api.getFilms()
   .then((films) => {
     renderFilmsByCategory(films, amountFilms);
-    renderFilters(filtersContainer, films, statisticItem);
+    renderFilters(filtersContainer, films);
   });
 
 // stats --> filter

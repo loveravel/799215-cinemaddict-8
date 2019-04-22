@@ -79,6 +79,13 @@ export default class Film extends Component {
   get template() {
     const duration = tools.getTimeFromMinutes(this._duration);
 
+    const controls = `
+      <form class="film-card__controls">
+        <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
+        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
+        <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
+      </form>`;
+
     return `
     <article class="film-card">
       <h3 class="film-card__title">${this._title}</h3>
@@ -91,12 +98,7 @@ export default class Film extends Component {
       <img src="${this._poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${this._description}</p>
       <button class="film-card__comments">${this._comments.length} comments</button>
-
-      <form class="film-card__controls">
-        <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
-        <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
-        <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
-      </form>
+      ${controls}
     </article>`.trim();
   }
 
