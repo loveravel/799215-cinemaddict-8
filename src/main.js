@@ -22,7 +22,7 @@ const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
-let amountFilms = 5;
+let amountFilmsOnMainContainer = 5;
 
 /*
 * Фильмы
@@ -31,6 +31,7 @@ let amountFilms = 5;
 const mainFilmsContainer = document.querySelector(`.films-list .films-list__container`);
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
 const boardNoFilms = document.querySelector(`.board__no-films`);
+const showMoreButton = document.querySelector(`.films-list__show-more`);
 
 const renderFilms = (container, filmsData) => {
   container.innerHTML = ``;
@@ -71,6 +72,10 @@ const renderFilms = (container, filmsData) => {
     filmDetails.onClose = () => {
       filmDetails.unrender();
     };
+
+    filmDetails.onEsc = () => {
+      filmDetails.unrender();
+    };
   }
 };
 
@@ -101,6 +106,7 @@ const doFilmsFiltering = (films, filterName) => {
 const renderFilters = (container, films) => {
   const filtersData = data.getFiltersData(films);
   filtersData.forEach((filterData) => {
+    filterData.count = doFilmsFiltering(films, filterData.name.toLowerCase()).length;
     const filter = new Filter(filterData);
 
     container.appendChild(filter.render());
@@ -129,7 +135,11 @@ const renderFilters = (container, films) => {
       statisticBlock.classList.add(`visually-hidden`);
       filmsBlock.classList.remove(`visually-hidden`);
       const filteredFilms = doFilmsFiltering(films, filter.name.toLowerCase());
-      renderFilms(mainFilmsContainer, filteredFilms);
+      amountFilmsOnMainContainer = 5;
+      if (showMoreButton.classList.contains(`visually-hidden`)) {
+        showMoreButton.classList.remove(`visually-hidden`);
+      }
+      renderFilmsByCategory(filteredFilms, amountFilmsOnMainContainer);
     };
   });
 };
@@ -152,14 +162,13 @@ const renderFilmsByCategory = (films) => {
   renderFilms(filmsExtraContainers[1], mostFilms);
 
   mainFilmsContainer.innerHTML = ``;
-  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilms));
+  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer));
 
-  const showMoreButton = document.querySelector(`.films-list__show-more`);
   const onShowMoreButtonClick = () => {
     mainFilmsContainer.innerHTML = ``;
-    amountFilms += 5;
-    renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilms));
-    if (amountFilms === films.length) {
+    amountFilmsOnMainContainer += 5;
+    renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer));
+    if (amountFilmsOnMainContainer === films.length) {
       showMoreButton.classList.add(`visually-hidden`);
     }
   };
@@ -184,7 +193,7 @@ const showNumberOfFilmsInFooter = (films) => {
 
 api.getFilms()
   .then((films) => {
-    renderFilmsByCategory(films, amountFilms);
+    renderFilmsByCategory(films, amountFilmsOnMainContainer);
     renderFilters(filtersContainer, films);
     showNumberOfFilmsInFooter(films);
   });

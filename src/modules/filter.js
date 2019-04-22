@@ -35,6 +35,11 @@ export default class Filter extends Component {
   }
 
   get template() {
+    
+    if (this._name === `Stats` || this._name === `All movies`) {
+      this._count = 0;
+    }
+    
     return `
       <a href="#${this._link}" class="main-navigation__item 
         ${this._active ? `main-navigation__item--active` : ``}">

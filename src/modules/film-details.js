@@ -58,6 +58,7 @@ export default class FilmDetails extends Component {
 
     this._onScoreChange = this._onScoreChange.bind(this);
     this._onCommentPosting = this._onCommentPosting.bind(this);
+    this._onEscKeydown = this._onEscKeydown.bind(this);
 
     this._onChangeForm = null;
   }
@@ -157,6 +158,19 @@ export default class FilmDetails extends Component {
 
   set onClose(fn) {
     this._onClose = fn;
+  }
+
+  _onEscKeydown(evt) {
+    if (evt.keyCode === Keycode.ESC) {
+      evt.preventDefault();
+      if (typeof this._onEsc === `function`) {
+        this._onEsc();
+      }
+    }
+  }
+
+  set onEsc(fn) {
+    this._onEsc = fn;
   }
 
   get template() {
@@ -342,6 +356,9 @@ export default class FilmDetails extends Component {
 
     this._element.querySelector(`.film-details__comment-input`)
       .addEventListener(`keydown`, this._onCommentPosting);
+
+    document
+      .addEventListener(`keydown`, this._onEscKeydown);
   }
 
   unbind() {
@@ -354,6 +371,9 @@ export default class FilmDetails extends Component {
 
     this._element.querySelector(`.film-details__comment-input`)
       .removeEventListener(`keydown`, this._onCommentPosting);
+
+    document
+      .removeEventListener(`keydown`, this._onEscKeydown);
   }
 
   _partialUpdate() {
