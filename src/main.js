@@ -79,7 +79,6 @@ const renderFilms = (container, filmsData) => {
 * */
 
 const filtersContainer = document.querySelector(`.main-navigation`);
-const statisticItem = document.querySelector(`.main-navigation__item--additional`);
 
 const doFilmsFiltering = (films, filterName) => {
   switch (filterName) {
@@ -174,6 +173,11 @@ const renderFilmsByCategory = (films) => {
 const statisticBlock = document.querySelector(`.statistic`);
 const filmsBlock = document.querySelector(`.films`);
 
+const showNumberOfFilmsInFooter = (films) => {
+  const footerStatistics = document.querySelector(`.footer__statistics p`);
+  footerStatistics.innerHTML = `${films.length} movies inside`;
+};
+
 /*
 * Render
 * */
@@ -182,6 +186,5 @@ api.getFilms()
   .then((films) => {
     renderFilmsByCategory(films, amountFilms);
     renderFilters(filtersContainer, films);
+    showNumberOfFilmsInFooter(films);
   });
-
-// stats --> filter
