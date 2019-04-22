@@ -10,7 +10,7 @@ import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
 
 /*
-* Наюор констант
+* Набор констант
 * */
 
 const AUTHORIZATION = `Basic sdfkjXjkl324X`;
@@ -33,7 +33,7 @@ const DefaultNumberOfFilms = {
 
 const initialFilmsData = [];
 
-const filmsContainer = document.querySelector(`.films-list .films-list__container`);
+const mainFilmsContainer = document.querySelector(`.films-list .films-list__container`);
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
 const boardNoFilms = document.querySelector(`.board__no-films`);
 
@@ -128,14 +128,43 @@ const renderFilters = (container, films, insertionPoint) => {
       statisticBlock.classList.add(`visually-hidden`);
       filmsBlock.classList.remove(`visually-hidden`);
       const filteredFilms = doFilmsFiltering(films, filter.name.toLowerCase());
-      renderFilms(filmsContainer, filteredFilms);
+      renderFilms(mainFilmsContainer, filteredFilms);
     };
   });
 };
 
-const renderFilteredFilms = (films) => {
-  filmsContainer.innerHTML = ``;
-  renderFilms(filmsContainer, films);
+const renderFilmsByCategory = (films) => {
+  const topFilms = films.sort((prevFilm, nextFilm) => {
+    return nextFilm.rating - prevFilm.rating;
+  }).splice(0, 2);
+
+  const mostFilms = films.sort((prevFilm, nextFilm) => {
+    return nextFilm.comments.length - prevFilm.comments.length;
+  }).splice(0, 2);
+
+  let mainFilms = films;
+
+  filmsExtraContainers[0].innerHTML = ``;
+  renderFilms(filmsExtraContainers[0], topFilms);
+
+  filmsExtraContainers[1].innerHTML = ``;
+  renderFilms(filmsExtraContainers[1], mostFilms);
+
+  mainFilmsContainer.innerHTML = ``;
+  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilms));
+
+  const showMoreButton = document.querySelector(`.films-list__show-more`);
+  const onShowMoreButtonClick = () => {
+    mainFilmsContainer.innerHTML = ``;
+    amountFilms += 5;
+    renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilms));
+    if (amountFilms === films.length) {
+      showMoreButton.classList.add(`visually-hidden`);
+    }
+  };
+  showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
+
+  films.push(...topFilms, ...mostFilms);
 };
 
 /*
@@ -161,9 +190,11 @@ statisticItem.addEventListener(`click`, onStatsItemClick);
 * Render
 * */
 
+let amountFilms = 5;
+
 api.getFilms()
   .then((films) => {
-    renderFilteredFilms(films);
+    renderFilmsByCategory(films, amountFilms);
     renderFilters(filtersContainer, films, statisticItem);
   });
 
