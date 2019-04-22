@@ -3,20 +3,26 @@
 * */
 
 import Component from './component';
+import moment from "moment";
 
 /*
 * Набор констант
 * */
 
-const KEYCODE = {
+const Keycode = {
   ENTER: 13,
   ESC: 27,
 };
 
-const EMOJI = {
+const Emotion = {
   [`sleeping`]: `😴`,
   [`neutral-face`]: `😐`,
   [`grinning`]: `😀`,
+};
+
+const Rating = {
+  MINIMUM_VALUE: 1,
+  MAXIMUM_VALUE: 10,
 };
 
 /*
@@ -26,7 +32,9 @@ const EMOJI = {
 export default class FilmDetails extends Component {
   constructor(data) {
     super();
+    this._id = data.id;
     this._title = data.title;
+    this._altTitle = data.altTitle;
     this._rating = data.rating;
     this._userRating = data.userRating;
     this._duration = data.duration;
@@ -39,8 +47,11 @@ export default class FilmDetails extends Component {
     this._writers = data.writers;
     this._actors = data.actors;
     this._comments = data.comments;
-    this._releaseDate = data.date.releaseDate;
-    this._list = data.list;
+    this._date = data.date;
+
+    this._isWatched = data.isWatched;
+    this._isWatchlist = data.isWatchlist;
+    this._isFavorite = data.isFavorite;
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
     this._onClose = null;
@@ -109,14 +120,14 @@ export default class FilmDetails extends Component {
 
   /* Добавление нового комментария пользователем */
   _onCommentPosting(evt) {
-    if (evt.keyCode === KEYCODE.ENTER && evt.ctrlKey) {
+    if (evt.keyCode === Keycode.ENTER && evt.ctrlKey) {
       evt.preventDefault();
 
       this._comments.push({
-        sentence: evt.target.value,
-        person: `Me`,
+        comment: evt.target.value,
+        author: `Me`,
         date: new Date().getFullYear(),
-        emoji: EMOJI[document.querySelector(`.film-details__emoji-item:checked`).value],
+        emotion: Emotion[document.querySelector(`.film-details__emoji-item:checked`).value],
       });
 
       const formData = new FormData(this._element.querySelector(`.film-details__inner`));
@@ -151,13 +162,19 @@ export default class FilmDetails extends Component {
   get template() {
     const userRating = this._userRating;
     let ratings = ``;
-    for (let i = 1; i <= 10; i++) {
+    for (let i = Rating.MINIMUM_VALUE; i <= Rating.MAXIMUM_VALUE; i++) {
       ratings += `
             <input type="radio" name="score"
               class="film-details__user-rating-input visually-hidden"
-              value="${i}" id="rating-${i}" ${userRating === i.toString() ? `checked` : ``}>
+              value="${i}" id="rating-${i}" ${userRating.toString() === i.toString() ? `checked` : ``}>
             <label class="film-details__user-rating-label"
               for="rating-${i}">${i}</label>`;
+    }
+
+    const genreNames = this._genre;
+    let genres = ``;
+    for (const genre of genreNames) {
+      genres += `<span class="film-details__genre">${genre}</span>`;
     }
 
     return `
@@ -168,16 +185,16 @@ export default class FilmDetails extends Component {
         </div>
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
-            <img class="film-details__poster-img" src="images/posters/${this._poster}.jpg" alt="${this._title}">
+            <img class="film-details__poster-img" src="${this._poster}" alt="${this._title}">
     
-            <p class="film-details__age">${this._ageLimit}</p>
+            <p class="film-details__age">${this._ageLimit}+</p>
           </div>
     
           <div class="film-details__info">
             <div class="film-details__info-head">
               <div class="film-details__title-wrap">
                 <h3 class="film-details__title">${this._title}</h3>
-                <p class="film-details__title-original">${this._title}</p>
+                <p class="film-details__title-original">${this._altTitle}</p>
               </div>
     
               <div class="film-details__rating">
@@ -203,7 +220,7 @@ export default class FilmDetails extends Component {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${this._releaseDate} (${this._country})</td>
+                <td class="film-details__cell">${moment(`${this._date}`).format(`DD MMMM YYYY`)} (${this._country})</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
@@ -215,10 +232,7 @@ export default class FilmDetails extends Component {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Genres</td>
-                <td class="film-details__cell">
-                  <span class="film-details__genre">${this._genre}</span>
-                  <span class="film-details__genre">${this._genre}</span>
-                  <span class="film-details__genre">${this._genre}</span></td>
+                <td class="film-details__cell">${genres}</td>
               </tr>
             </table>
     
@@ -230,21 +244,21 @@ export default class FilmDetails extends Component {
     
         <section class="film-details__controls">
           <input type="checkbox" class="film-details__control-input visually-hidden"
-            id="watchlist" name="watchlist" ${this._list.isWatchlist ? `checked` : ``}>
+            id="watchlist" name="watchlist" ${this._isWatchlist ? `checked` : ``}>
           <label for="watchlist"
             class="film-details__control-label film-details__control-label--watchlist">
             Add to watchlist
           </label>
     
           <input type="checkbox" class="film-details__control-input visually-hidden"
-            id="watched" name="watched" ${this._list.isWatched ? `checked` : ``}>
+            id="watched" name="watched" ${this._isWatched ? `checked` : ``}>
           <label for="watched"
             class="film-details__control-label film-details__control-label--watched">
             Already watched
           </label>
     
           <input type="checkbox" class="film-details__control-input visually-hidden"
-            id="favorite" name="favorite" ${this._list.isFavorite ? `checked` : ``}>
+            id="favorite" name="favorite" ${this._isFavorite ? `checked` : ``}>
           <label for="favorite"
             class="film-details__control-label film-details__control-label--favorite">
             Add to favorites
@@ -257,12 +271,14 @@ export default class FilmDetails extends Component {
           ${(Array.from(this._comments).map((comment) => (`
             <ul class="film-details__comments-list">
               <li class="film-details__comment">
-                <span class="film-details__comment-emoji">${comment.emoji}</span>
+                <span class="film-details__comment-emoji">${Emotion[comment.emotion]}</span>
                 <div>
-                  <p class="film-details__comment-text">${comment.sentence}</p>
+                  <p class="film-details__comment-text">${comment.comment}</p>
                   <p class="film-details__comment-info">
-                    <span class="film-details__comment-author">${comment.person}</span>
-                    <span class="film-details__comment-day">${comment.date}</span>
+                    <span class="film-details__comment-author">${comment.author}</span>
+                    <span class="film-details__comment-day">
+                      ${moment(comment.date).fromNow(true)} ago
+                    </span>
                   </p>
                 </div>
               </li>
@@ -298,7 +314,7 @@ export default class FilmDetails extends Component {
     
           <div class="film-details__user-score">
             <div class="film-details__user-rating-poster">
-              <img src="images/posters/${this._poster}.jpg" alt="film-poster" class="film-details__user-rating-img">
+              <img src="${this._poster}" alt="film-poster" class="film-details__user-rating-img">
             </div>
     
             <section class="film-details__user-rating-inner">
@@ -349,6 +365,8 @@ export default class FilmDetails extends Component {
 
   update(data) {
     this._userRating = data.userRating;
-    this._list = data.list;
+    this._isFavorite = data.isFavorite;
+    this._isWatched = data.isWatched;
+    this._isWatchlist = data.isWatchlist;
   }
 }

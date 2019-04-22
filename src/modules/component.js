@@ -15,12 +15,6 @@ export default class Component {
     }
 
     this._element = null;
-
-    this._state = {
-      isWatchlist: false,
-      isWatched: false,
-      isFavorite: false,
-    };
   }
 
   get element() {

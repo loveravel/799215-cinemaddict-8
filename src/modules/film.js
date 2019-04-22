@@ -4,6 +4,7 @@
 
 import Component from './component';
 import * as tools from '../tools.js';
+import moment from "moment";
 
 /*
 * Набор экспортируемых значений
@@ -12,9 +13,10 @@ import * as tools from '../tools.js';
 export default class Film extends Component {
   constructor(data) {
     super();
+    this._id = data.id;
     this._title = data.title;
     this._rating = data.rating;
-    this._yearOfIssue = data.date.yearOfIssue;
+    this._date = data.date;
     this._duration = data.duration;
     this._genre = data.genre;
     this._poster = data.poster;
@@ -82,11 +84,11 @@ export default class Film extends Component {
       <h3 class="film-card__title">${this._title}</h3>
       <p class="film-card__rating">${this._rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${this._yearOfIssue}</span>
+        <span class="film-card__year">${moment(`${this._date}`).year()}</span>
         <span class="film-card__duration">${duration.hours}h ${duration.minutes}m</span>
-        <span class="film-card__genre">${this._genre}</span>
+        <span class="film-card__genre">${this._genre[0]}</span>
       </p>
-      <img src="./images/posters/${this._poster}.jpg" alt="" class="film-card__poster">
+      <img src="${this._poster}" alt="" class="film-card__poster">
       <p class="film-card__description">${this._description}</p>
       <button class="film-card__comments">${this._comments.length} comments</button>
 

@@ -5,12 +5,22 @@
 import Film from './modules/film.js';
 import FilmDetails from './modules/film-details.js';
 import Filter from './modules/filter.js';
+import API from './api.js';
 import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
 
 /*
+* Наюор констант
+* */
+
+const AUTHORIZATION = `Basic sdfkjXjkl324X`;
+const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
+
+/*
 * Тело модуля
 * */
+
+const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 
 /*
 * Фильмы
@@ -21,24 +31,17 @@ const DefaultNumberOfFilms = {
   EXTRA: 2,
 };
 
-const getFilmsData = (amount) => {
-  const films = [];
-  for (let i = 0; i < amount; i++) {
-    films.push(data.getFilmData());
-  }
-  return films;
-};
-
-const initialFilmsData = getFilmsData(DefaultNumberOfFilms.ALL);
+const initialFilmsData = [];
 
 const filmsContainer = document.querySelector(`.films-list .films-list__container`);
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
+const boardNoFilms = document.querySelector(`.board__no-films`);
 
 const renderFilms = (container, filmsData) => {
   container.innerHTML = ``;
-  for (let i = 0; i < filmsData.length; i++) {
-    const film = new Film(filmsData[i]);
-    const filmDetails = new FilmDetails(filmsData[i]);
+  for (const filmData of filmsData) {
+    const film = new Film(filmData);
+    const filmDetails = new FilmDetails(filmData);
 
     container.appendChild(film.render());
 
@@ -48,26 +51,26 @@ const renderFilms = (container, filmsData) => {
     };
 
     film.onAddToWatchlist = () => {
-      filmsData[i].list.isWatchlist = !filmsData[i].list.isWatchlist;
-      filmDetails.update(filmsData[i]);
+      filmData.isWatchlist = !filmData.isWatchlist;
+      filmDetails.update(filmData);
     };
 
     film.onMarkAsWatched = () => {
-      filmsData[i].list.isWatched = !filmsData[i].list.isWatched;
-      filmDetails.update(filmsData[i]);
+      filmData.isWatched = !filmData.isWatched;
+      filmDetails.update(filmData);
     };
 
     film.onMarkAsFavorite = () => {
-      filmsData[i].list.isFavorite = !filmsData[i].list.isFavorite;
-      filmDetails.update(filmsData[i]);
+      filmData.isFavorite = !filmData.isFavorite;
+      filmDetails.update(filmData);
     };
 
     filmDetails.onChangeForm = (newObject) => {
-      filmsData[i].userRating = newObject.userRating;
-      filmsData[i].comments = newObject.comments;
+      filmData.userRating = newObject.userRating;
+      filmData.comments = newObject.comments;
 
-      filmDetails.update(filmsData[i]);
-      film.update(filmsData[i]);
+      filmDetails.update(filmData);
+      film.update(filmData);
     };
 
     filmDetails.onClose = () => {
@@ -75,8 +78,6 @@ const renderFilms = (container, filmsData) => {
     };
   }
 };
-
-renderFilms(filmsContainer, initialFilmsData);
 
 const renderFilmsExtra = (filmsData) => {
   filmsExtraContainers.forEach((extraContainer) => {
@@ -99,20 +100,20 @@ const doFilmsFiltering = (films, filterName) => {
       return films;
 
     case `watchlist`:
-      return films.filter((it) => it.list.isWatchlist);
+      return films.filter((it) => it.isWatchlist);
 
     case `history`:
-      return films.filter((it) => it.list.isWatched);
+      return films.filter((it) => it.isWatched);
 
     case `favorites`:
-      return films.filter((it) => it.list.isFavorite);
+      return films.filter((it) => it.isFavorite);
 
     default: return films;
   }
 };
 
-const renderFilters = (container, insertionPoint) => {
-  const filtersData = data.getFiltersData();
+const renderFilters = (container, films, insertionPoint) => {
+  const filtersData = data.getFiltersData(films);
   filtersData.forEach((filterData) => {
     const filter = new Filter(filterData);
 
@@ -126,13 +127,16 @@ const renderFilters = (container, insertionPoint) => {
       filter.element.classList.add(`main-navigation__item--active`);
       statisticBlock.classList.add(`visually-hidden`);
       filmsBlock.classList.remove(`visually-hidden`);
-      const filteredFilms = doFilmsFiltering(initialFilmsData, filter.name.toLowerCase());
+      const filteredFilms = doFilmsFiltering(films, filter.name.toLowerCase());
       renderFilms(filmsContainer, filteredFilms);
     };
   });
 };
 
-renderFilters(filtersContainer, statisticItem);
+const renderFilteredFilms = (films) => {
+  filmsContainer.innerHTML = ``;
+  renderFilms(filmsContainer, films);
+};
 
 /*
 * Статистика
@@ -141,13 +145,26 @@ renderFilters(filtersContainer, statisticItem);
 const statisticBlock = document.querySelector(`.statistic`);
 const filmsBlock = document.querySelector(`.films`);
 
-const onStatsItemClick = () => {
+const onStatsItemClick = (films) => {
   statisticBlock.classList.remove(`visually-hidden`);
   filmsBlock.classList.add(`visually-hidden`);
-  renderStatistic(initialFilmsData);
+  renderStatistic(films);
   const activeFilter = document.querySelector(`.main-navigation__item--active`);
   activeFilter.classList.remove(`main-navigation__item--active`);
   statisticItem.classList.add(`main-navigation__item--active`);
 };
 
 statisticItem.addEventListener(`click`, onStatsItemClick);
+
+
+/*
+* Render
+* */
+
+api.getFilms()
+  .then((films) => {
+    renderFilteredFilms(films);
+    renderFilters(filtersContainer, films, statisticItem);
+  });
+
+// stats --> filter

@@ -144,6 +144,7 @@ const filmMakingData = {
 * Набор экспортируемых значений
 * */
 
+/*
 export const getFilmData = () => {
   return {
     title: filmMakingData.title,
@@ -175,8 +176,9 @@ export const getFilmData = () => {
     }
   };
 };
+*/
 
-export const getFiltersData = () => {
+export const getFiltersData = (films) => {
   return [
     {
       name: `All movies`,
@@ -188,19 +190,19 @@ export const getFiltersData = () => {
       name: `Watchlist`,
       link: `watchlist`,
       active: false,
-      count: tools.getRandomInteger(1, 10),
+      count: films.length,
     },
     {
       name: `History`,
       link: `history`,
       active: false,
-      count: tools.getRandomInteger(1, 10),
+      count: films.length,
     },
     {
       name: `Favorites`,
       link: `favorites`,
       active: false,
-      count: tools.getRandomInteger(1, 10),
+      count: films.length,
     },
   ];
 };
