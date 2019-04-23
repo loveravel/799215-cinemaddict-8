@@ -35,7 +35,7 @@ export default class Filter extends Component {
   }
 
   get template() {
-    
+
     if (this._name === `Stats` || this._name === `All movies`) {
       this._count = 0;
     }

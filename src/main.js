@@ -61,6 +61,21 @@ const renderFilms = (container, filmsData) => {
       filmDetails.update(filmData);
     };
 
+    filmDetails.onAddToWatchlist = () => {
+      filmData.isWatchlist = !filmData.isWatchlist;
+      filmDetails.update(filmData);
+    };
+
+    filmDetails.onMarkAsWatched = () => {
+      filmData.isWatched = !filmData.isWatched;
+      filmDetails.update(filmData);
+    };
+
+    filmDetails.onMarkAsFavorite = () => {
+      filmData.isFavorite = !filmData.isFavorite;
+      filmDetails.update(filmData);
+    };
+
     filmDetails.onChangeForm = (newObject) => {
       filmData.userRating = newObject.userRating;
       filmData.comments = newObject.comments;
