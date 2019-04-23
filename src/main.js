@@ -42,6 +42,9 @@ const renderFilms = (container, filmsData) => {
     container.appendChild(film.render());
 
     film.onDetails = () => {
+      if (document.querySelector(`.film-details`)) {
+        document.querySelector(`.film-details`).remove();
+      }
       const filmDetailsElement = filmDetails.render();
       document.body.appendChild(filmDetailsElement);
     };
