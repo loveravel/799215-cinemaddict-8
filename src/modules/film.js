@@ -81,6 +81,10 @@ export default class Film extends Component {
   get template() {
     const duration = tools.getTimeFromMinutes(this._duration);
 
+    if (this._description.length > 140) {
+      this._description = `${this._description.substring(0, 137)}...`;
+    }
+
     const controls = `
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
