@@ -149,8 +149,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onChangeForm(fn) {
-    this._onChangeForm = fn;
+  set onChangeForm(callback) {
+    this._onChangeForm = callback;
   }
 
   /* Закрытие попапа */
@@ -160,8 +160,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onClose(fn) {
-    this._onClose = fn;
+  set onClose(callback) {
+    this._onClose = callback;
   }
 
   _onEscKeydown(evt) {
@@ -173,8 +173,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onEsc(fn) {
-    this._onEsc = fn;
+  set onEsc(callback) {
+    this._onEsc = callback;
   }
 
   _onAddToWatchlistClick() {
@@ -183,8 +183,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onAddToWatchlist(fn) {
-    this._onAddToWatchlist = fn;
+  set onAddToWatchlist(callback) {
+    this._onAddToWatchlist = callback;
   }
 
   _onMarkAsWatchedClick() {
@@ -193,8 +193,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onMarkAsWatched(fn) {
-    this._onMarkAsWatched = fn;
+  set onMarkAsWatched(callback) {
+    this._onMarkAsWatched = callback;
   }
 
   _onMarkAsFavoriteClick() {
@@ -203,8 +203,8 @@ export default class FilmDetails extends Component {
     }
   }
 
-  set onMarkAsFavorite(fn) {
-    this._onMarkAsFavorite = fn;
+  set onMarkAsFavorite(callback) {
+    this._onMarkAsFavorite = callback;
   }
 
   get template() {

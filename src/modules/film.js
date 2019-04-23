@@ -41,8 +41,8 @@ export default class Film extends Component {
     }
   }
 
-  set onDetails(fn) {
-    this._onDetails = fn;
+  set onDetails(callback) {
+    this._onDetails = callback;
   }
 
   _onAddToWatchlistClick(evt) {
@@ -52,8 +52,8 @@ export default class Film extends Component {
     }
   }
 
-  set onAddToWatchlist(fn) {
-    this._onAddToWatchlist = fn;
+  set onAddToWatchlist(callback) {
+    this._onAddToWatchlist = callback;
   }
 
   _onMarkAsWatchedClick(evt) {
@@ -63,8 +63,8 @@ export default class Film extends Component {
     }
   }
 
-  set onMarkAsWatched(fn) {
-    this._onMarkAsWatched = fn;
+  set onMarkAsWatched(callback) {
+    this._onMarkAsWatched = callback;
   }
 
   _onMarkAsFavoriteClick(evt) {
@@ -74,8 +74,8 @@ export default class Film extends Component {
     }
   }
 
-  set onMarkAsFavorite(fn) {
-    this._onMarkAsFavorite = fn;
+  set onMarkAsFavorite(callback) {
+    this._onMarkAsFavorite = callback;
   }
 
   get template() {

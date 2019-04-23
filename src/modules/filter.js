@@ -26,8 +26,8 @@ export default class Filter extends Component {
     }
   }
 
-  set onClick(fn) {
-    this._onClick = fn;
+  set onClick(callback) {
+    this._onClick = callback;
   }
 
   get name() {
@@ -39,7 +39,7 @@ export default class Filter extends Component {
     if (this._name === `Stats` || this._name === `All movies`) {
       this._count = 0;
     }
-    
+
     return `
       <a href="#${this._link}" class="main-navigation__item 
         ${this._active ? `main-navigation__item--active` : ``}">
