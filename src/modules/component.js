@@ -42,4 +42,10 @@ export default class Component {
   }
 
   update() {}
+
+  _partialUpdate() {
+    const parentElement = this._element.parentNode;
+    const oldElement = this._element;
+    parentElement.replaceChild(this.render(), oldElement);
+  }
 }

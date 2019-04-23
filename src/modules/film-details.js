@@ -424,12 +424,6 @@ export default class FilmDetails extends Component {
       .removeEventListener(`click`, this._onMarkAsFavoriteClick);
   }
 
-  _partialUpdate() {
-    const parentElement = this._element.parentNode;
-    const oldElement = this._element;
-    parentElement.replaceChild(this.render(), oldElement);
-  }
-
   update(data) {
     // this.userRating = data.userRating;
     this.isFavorite = data.isFavorite;

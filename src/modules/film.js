@@ -147,14 +147,12 @@ export default class Film extends Component {
     }
   }
 
-  _partialUpdate() {
-    const parentElement = this._element.parentNode;
-    const oldElement = this._element;
-    parentElement.replaceChild(this.render(), oldElement);
-  }
-
   update(data) {
     this.comments = data.comments;
+
+    this.isFavorite = data.isFavorite;
+    this.isWatched = data.isWatched;
+    this.isWatchlist = data.isWatchlist;
 
     this.unbind();
     this._partialUpdate();
