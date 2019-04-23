@@ -33,9 +33,10 @@ const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .film
 const boardNoFilms = document.querySelector(`.board__no-films`);
 const showMoreButton = document.querySelector(`.films-list__show-more`);
 
-const renderFilms = (container, filmsData) => {
+const renderFilms = (container, filmsData, mainBlockBool) => {
   container.innerHTML = ``;
   for (const filmData of filmsData) {
+    filmData.mainBlock = mainBlockBool;
     const film = new Film(filmData);
     const filmDetails = new FilmDetails(filmData);
 
@@ -174,13 +175,13 @@ const renderFilmsByCategory = (films) => {
   let mainFilms = films;
 
   filmsExtraContainers[0].innerHTML = ``;
-  renderFilms(filmsExtraContainers[0], topFilms);
+  renderFilms(filmsExtraContainers[0], topFilms, false);
 
   filmsExtraContainers[1].innerHTML = ``;
-  renderFilms(filmsExtraContainers[1], mostFilms);
+  renderFilms(filmsExtraContainers[1], mostFilms, false);
 
   mainFilmsContainer.innerHTML = ``;
-  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer));
+  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer), true);
 
   const onShowMoreButtonClick = () => {
     mainFilmsContainer.innerHTML = ``;
