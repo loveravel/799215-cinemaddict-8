@@ -32,6 +32,7 @@ const mainFilmsContainer = document.querySelector(`.films-list .films-list__cont
 const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
 const boardNoFilms = document.querySelector(`.board__no-films`);
 const showMoreButton = document.querySelector(`.films-list__show-more`);
+const searchField = document.querySelector(`.search__field`);
 
 const renderFilms = (container, filmsData, mainBlockBool) => {
   container.innerHTML = ``;
@@ -207,6 +208,20 @@ const showNumberOfFilmsInFooter = (films) => {
 };
 
 /*
+* Search
+* */
+
+const doSearch = (evt, films) => {
+  mainFilmsContainer.innerHTML = ``;
+
+  const filmsAfterSearch = films.filter((film) => {
+    return film.title.match(searchField.value);
+  });
+
+  renderFilms(mainFilmsContainer, filmsAfterSearch.slice(0, amountFilmsOnMainContainer), true);
+};
+
+/*
 * Render
 * */
 
@@ -215,4 +230,7 @@ api.getFilms()
     renderFilmsByCategory(films, amountFilmsOnMainContainer);
     renderFilters(filtersContainer, films);
     showNumberOfFilmsInFooter(films);
+    searchField.addEventListener(`input`, function (evt) {
+      doSearch(evt, films);
+    });
   });
