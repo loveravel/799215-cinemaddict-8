@@ -62,7 +62,7 @@ export default class ModelFilm {
       'comments': data.comments,
       'film_info': {
         'actors': data.actors,
-        'age_rating': data.ageRating,
+        'age_rating': data.ageLimit,
         'alternative_title': data.altTitle,
         'description': data.description,
         'director': data.director,
@@ -74,13 +74,13 @@ export default class ModelFilm {
         },
         'runtime': data.runtime,
         'title': data.title,
-        'total_rating': data.totalRating,
+        'total_rating': data.rating,
         'writers': [...data.writers]
       },
       'user_details': {
         'already_watched': data.isWatched,
         'favorite': data.isFavorite,
-        'personal_rating': data.personalRating,
+        'personal_rating': data.userRating,
         'watchlist': data.isWatchlist
       }
     };

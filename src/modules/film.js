@@ -13,15 +13,26 @@ import moment from "moment";
 export default class Film extends Component {
   constructor(data) {
     super();
-    this._id = data.id;
-    this._title = data.title;
-    this._rating = data.rating;
-    this._date = data.date;
-    this._duration = data.duration;
-    this._genre = data.genre;
-    this._poster = data.poster;
-    this._description = data.description;
-    this._comments = data.comments;
+    this.id = data.id;
+    this.title = data.title;
+    this.altTitle = data.altTitle;
+    this.rating = data.rating;
+    this.userRating = data.userRating;
+    this.duration = data.duration;
+    this.genre = data.genre;
+    this.poster = data.poster;
+    this.description = data.description;
+    this.ageLimit = data.ageLimit;
+    this.country = data.country;
+    this.director = data.director;
+    this.writers = data.writers;
+    this.actors = data.actors;
+    this.comments = data.comments;
+    this.date = data.date;
+
+    this.isWatched = data.isWatched;
+    this.isWatchlist = data.isWatchlist;
+    this.isFavorite = data.isFavorite;
 
     this._mainBlock = data.mainBlock;
 
@@ -79,10 +90,10 @@ export default class Film extends Component {
   }
 
   get template() {
-    const duration = tools.getTimeFromMinutes(this._duration);
+    const duration = tools.getTimeFromMinutes(this.duration);
 
-    if (this._description.length > 140) {
-      this._description = `${this._description.substring(0, 137)}...`;
+    if (this.description.length > 140) {
+      this.description = `${this.description.substring(0, 137)}...`;
     }
 
     const controls = `
@@ -94,16 +105,16 @@ export default class Film extends Component {
 
     return `
     <article class="film-card">
-      <h3 class="film-card__title">${this._title}</h3>
-      <p class="film-card__rating">${this._rating}</p>
+      <h3 class="film-card__title">${this.title}</h3>
+      <p class="film-card__rating">${this.rating}</p>
       <p class="film-card__info">
-        <span class="film-card__year">${moment(`${this._date}`).year()}</span>
+        <span class="film-card__year">${moment(`${this.date}`).year()}</span>
         <span class="film-card__duration">${duration.hours}h ${duration.minutes}m</span>
-        <span class="film-card__genre">${this._genre[0]}</span>
+        <span class="film-card__genre">${this.genre[0]}</span>
       </p>
-      <img src="${this._poster}" alt="" class="film-card__poster">
-      <p class="film-card__description">${this._description}</p>
-      <button class="film-card__comments">${this._comments.length} comments</button>
+      <img src="${this.poster}" alt="" class="film-card__poster">
+      <p class="film-card__description">${this.description}</p>
+      <button class="film-card__comments">${this.comments.length} comments</button>
       ${this._mainBlock ? controls : ``}
     </article>`.trim();
   }
@@ -137,14 +148,13 @@ export default class Film extends Component {
   }
 
   _partialUpdate() {
-    this._element.innerHTML = this.template;
-    const newElement = this._element.parentElement.insertBefore(this._element.firstChild, this._element);
-    this._element.remove();
-    this._element = newElement;
+    const parentElement = this._element.parentNode;
+    const oldElement = this._element;
+    parentElement.replaceChild(this.render(), oldElement);
   }
 
   update(data) {
-    this._comments = data.comments;
+    this.comments = data.comments;
 
     this.unbind();
     this._partialUpdate();

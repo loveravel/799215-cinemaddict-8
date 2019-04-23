@@ -8,12 +8,13 @@ import Filter from './modules/filter.js';
 import API from './api.js';
 import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
+import ModelFilm from './modules/model-film.js';
 
 /*
 * Набор констант
 * */
 
-const AUTHORIZATION = `Basic sdfkjXjkl324X=1234f`;
+const AUTHORIZATION = `Basic sdfkjXjkl324X=12333fd`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 
 /*
@@ -47,38 +48,103 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
       if (document.querySelector(`.film-details`)) {
         document.querySelector(`.film-details`).remove();
       }
+      filmDetails.update({
+        isWatchlist: film.isWatchlist,
+        isFavorite: film.isFavorite,
+        isWatched: film.isWatched
+      });
       const filmDetailsElement = filmDetails.render();
       document.body.appendChild(filmDetailsElement);
     };
 
     film.onAddToWatchlist = () => {
-      filmData.isWatchlist = !filmData.isWatchlist;
-      filmDetails.update(filmData);
+      film.isWatchlist = !film.isWatchlist;
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isWatchlist = !film.isWatchlist;
+        });
     };
 
     film.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-      filmDetails.update(filmData);
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isWatched = !film.isWatched;
+        });
     };
 
     film.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-      filmDetails.update(filmData);
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isFavorite = !film.isFavorite;
+        });
     };
 
     filmDetails.onAddToWatchlist = () => {
       filmData.isWatchlist = !filmData.isWatchlist;
-      filmDetails.update(filmData);
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isWatchlist = !film.isWatchlist;
+        });
     };
 
     filmDetails.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-      filmDetails.update(filmData);
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isWatched = !film.isWatched;
+        });
     };
 
     filmDetails.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-      filmDetails.update(filmData);
+
+      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
+        .then(() => {
+          film.unbind();
+          film._partialUpdate();
+          film.bind();
+          // updateFilters();
+        })
+        .catch(() => {
+          film.isFavorite = !film.isFavorite;
+        });
     };
 
     filmDetails.onChangeForm = (newObject) => {
@@ -163,6 +229,13 @@ const renderFilters = (container, films) => {
     };
   });
 };
+/*
+const updateFilters = (filtersData, films) => {
+  filtersData.forEach((filterData) => {
+    filterData.count = doFilmsFiltering(films, filterData.name.toLowerCase()).length;
+    filterData._partialUpdate();
+  });
+};*/
 
 const renderFilmsByCategory = (films) => {
   const topFilms = films.sort((prevFilm, nextFilm) => {
