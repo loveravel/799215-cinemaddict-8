@@ -3,24 +3,14 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import * as tools from '../tools.js';
 
 const RANK_MIN_VALUE = new Map([
-  [`Movie Buff`, 20],
+  [`Movie Buff`, 21],
   [`Fan`, 11],
   [`Novice`, 1],
 ]);
 
 const statisticBlock = document.querySelector(`.statistic`);
 
-const getTemplateStatistic = (filmsData, mostPopularGenre, watchedFilms) => {
-
-  const getRank = () => {
-    for (const rank of RANK_MIN_VALUE) {
-      if (rank[1] < watchedFilms.length) {
-        return rank[0];
-      }
-    }
-    return `You did not watch movies`;
-  };
-
+const getTemplateStatistic = (filmsData, mostPopularGenre, rank) => {
   let totalDuration = 0;
   if (filmsData.length) {
     totalDuration = filmsData.reduce((a, b) => {
@@ -30,9 +20,9 @@ const getTemplateStatistic = (filmsData, mostPopularGenre, watchedFilms) => {
   }
 
   return `
-    <p class="statistic__rank">Your rank <span class="statistic__rank-label">${getRank()}</span></p>
-  
-    <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters visually-hidden">
+    <p class="statistic__rank">Your rank <span class="statistic__rank-label">${rank}</span></p>
+    
+    <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
   
       <input type="radio" class="statistic__filters-input visually-hidden"
@@ -142,7 +132,7 @@ const drawChart = (genres) => {
   });
 };
 
-export default (films) => {
+export default (films, rank) => {
   const watchedFilms = films.filter((it) => it.isWatched);
 
   let totalGenres = [];
@@ -160,6 +150,6 @@ export default (films) => {
   let arrayValues = Object.values(resultGenres);
   let mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
 
-  statisticBlock.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre, watchedFilms);
+  statisticBlock.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre, rank);
   drawChart(resultGenres);
 };
