@@ -15,12 +15,6 @@ export default class Component {
     }
 
     this._element = null;
-
-    this._state = {
-      isWatchlist: false,
-      isWatched: false,
-      isFavorite: false,
-    };
   }
 
   get element() {
@@ -48,4 +42,10 @@ export default class Component {
   }
 
   update() {}
+
+  _partialUpdate() {
+    const parentElement = this._element.parentNode;
+    const oldElement = this._element;
+    parentElement.replaceChild(this.render(), oldElement);
+  }
 }
