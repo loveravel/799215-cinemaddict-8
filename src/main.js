@@ -151,6 +151,7 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
     const updateData = () => {
       api.updateFilm({id: filmData.id, data: filmData.toRAW()})
         .then((newFilm) => {
+          film.update(newFilm);
           filmDetails.update(newFilm);
           renderFilters(Container.FILTERS, allFilms);
           getUserRank(allFilms);

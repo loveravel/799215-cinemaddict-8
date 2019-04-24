@@ -487,7 +487,7 @@ export default class FilmDetails extends Component {
       emotion.removeEventListener(`change`, this._onEmotionChange);
     });
 
-    if (this.getUserComments().length > 0) {
+    if (this.getUserComments().length > 1) {
       this._element.querySelector(`.film-details__watched-reset`)
         .removeEventListener(`click`, this._onCommentDelete);
     }
