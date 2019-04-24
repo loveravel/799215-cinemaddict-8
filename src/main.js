@@ -9,32 +9,87 @@ import API from './api.js';
 import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
 import ModelFilm from './modules/model-film.js';
+import {getFiltersData} from "./data";
 
 /*
 * Набор констант
 * */
 
-const AUTHORIZATION = `Basic sdfkjXjkl324X=12333fd`;
+const AUTHORIZATION = `Basic sdfkjXjkl324X=12d`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
+
+const Container = {
+  MAIN: document.querySelector(`.films-list .films-list__container`),
+  EXTRA: document.querySelectorAll(`.films-list--extra .films-list__container`),
+  STATISTIC: document.querySelector(`.statistic`),
+  FILMS: document.querySelector(`.films`),
+  FILTERS: document.querySelector(`.main-navigation`),
+};
+
+const Control = {
+  SHOW_MORE_BUTTON: document.querySelector(`.films-list__show-more`),
+  SEARCH_FIELD: document.querySelector(`.search__field`),
+};
+
+const StatisticItem = {
+  NUMBER_OF_FILMS: document.querySelector(`.footer__statistics`),
+  USER_RANK: document.querySelector(`.profile__rating`),
+};
+
+const Rank = {
+  NOVICE: `Novice`,
+  FAN: `Fan`,
+  MOVIE_BUFF: `Movie buff`
+};
+
+const RankCount = {
+  NOVICE: {min: 1, max: 10},
+  FAN: {min: 11, max: 20}
+};
 
 /*
 * Тело модуля
 * */
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-
 let amountFilmsOnMainContainer = 5;
+let allFilms = [];
 
-/*
-* Фильмы
-* */
+/* Функция для получения просмотренных фильмов */
+const getWatchedFilms = (films) => films.filter((it) => it.isWatched);
 
-const mainFilmsContainer = document.querySelector(`.films-list .films-list__container`);
-const filmsExtraContainers = document.querySelectorAll(`.films-list--extra .films-list__container`);
-const boardNoFilms = document.querySelector(`.board__no-films`);
-const showMoreButton = document.querySelector(`.films-list__show-more`);
-const searchField = document.querySelector(`.search__field`);
+/* Функция для определения ранга пользователя */
+const getUserRank = (films) => {
+  const watchedFilmsCount = getWatchedFilms(films).length;
+  let rank = ``;
 
+  if (watchedFilmsCount >= RankCount.NOVICE.min && watchedFilmsCount <= RankCount.NOVICE.max) {
+    rank = Rank.NOVICE;
+  } else if (watchedFilmsCount >= RankCount.FAN.min && watchedFilmsCount <= RankCount.FAN.max) {
+    rank = Rank.FAN;
+  } else if (watchedFilmsCount > RankCount.FAN.max) {
+    rank = Rank.MOVIE_BUFF;
+  }
+
+  StatisticItem.USER_RANK.innerHTML = `You rank: ${rank}!`;
+  return rank;
+};
+
+/* Функция для определения двух самых высокорейтинговых фильмов */
+const getFilmsTopRatings = (films) => {
+  return films.sort((prevFilm, nextFilm) => {
+    return nextFilm.rating - prevFilm.rating;
+  }).slice(0, 2);
+};
+
+/* Функция для определения двух самых коментируемых фильмов */
+const getFilmsTopComments = (films) => {
+  return films.sort((prevFilm, nextFilm) => {
+    return nextFilm.comments.length - prevFilm.comments.length;
+  }).slice(0, 2);
+};
+
+/* Функция для рендера фильмов */
 const renderFilms = (container, filmsData, mainBlockBool) => {
   container.innerHTML = ``;
   for (const filmData of filmsData) {
@@ -48,111 +103,41 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
       if (document.querySelector(`.film-details`)) {
         document.querySelector(`.film-details`).remove();
       }
-      filmDetails.update({
-        isWatchlist: film.isWatchlist,
-        isFavorite: film.isFavorite,
-        isWatched: film.isWatched
-      });
       const filmDetailsElement = filmDetails.render();
       document.body.appendChild(filmDetailsElement);
     };
 
+
+    /* Добавление в списки */
     film.onAddToWatchlist = () => {
-      film.isWatchlist = !film.isWatchlist;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isWatchlist = !film.isWatchlist;
-        });
+      filmData.isWatchlist = !filmData.isWatchlist;
+      updateData();
     };
-
     film.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isWatched = !film.isWatched;
-        });
+      updateData();
     };
-
     film.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isFavorite = !film.isFavorite;
-        });
+      updateData();
     };
-
     filmDetails.onAddToWatchlist = () => {
       filmData.isWatchlist = !filmData.isWatchlist;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isWatchlist = !film.isWatchlist;
-        });
+      updateData();
     };
-
     filmDetails.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isWatched = !film.isWatched;
-        });
+      updateData();
     };
-
     filmDetails.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-
-      api.updateFilm({id: film.id, data: ModelFilm.staticToRAW(film)})
-        .then(() => {
-          film.unbind();
-          film._partialUpdate();
-          film.bind();
-          // updateFilters();
-        })
-        .catch(() => {
-          film.isFavorite = !film.isFavorite;
-        });
+      updateData();
     };
 
     filmDetails.onChangeForm = (newObject) => {
       filmData.userRating = newObject.userRating;
       filmData.comments = newObject.comments;
-
-      filmDetails.update(filmData);
-      film.update(filmData);
+      updateData();
     };
 
     filmDetails.onClose = () => {
@@ -162,14 +147,21 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
     filmDetails.onEsc = () => {
       filmDetails.unrender();
     };
+
+    const updateData = () => {
+      api.updateFilm({id: filmData.id, data: filmData.toRAW()})
+        .then((newFilm) => {
+          filmDetails.update(newFilm);
+          renderFilters(Container.FILTERS, allFilms);
+          getUserRank(allFilms);
+        });
+    };
   }
 };
 
 /*
 * Фильтры
 * */
-
-const filtersContainer = document.querySelector(`.main-navigation`);
 
 const doFilmsFiltering = (films, filterName) => {
   switch (filterName) {
@@ -190,6 +182,7 @@ const doFilmsFiltering = (films, filterName) => {
 };
 
 const renderFilters = (container, films) => {
+  Container.FILTERS.innerHTML = ``;
   const filtersData = data.getFiltersData(films);
   filtersData.forEach((filterData) => {
     filterData.count = doFilmsFiltering(films, filterData.name.toLowerCase()).length;
@@ -201,9 +194,9 @@ const renderFilters = (container, films) => {
       filter.element.classList.add(`main-navigation__item--additional`);
 
       const onStatsItemClick = () => {
-        statisticBlock.classList.remove(`visually-hidden`);
-        filmsBlock.classList.add(`visually-hidden`);
-        renderStatistic(films);
+        Container.STATISTIC.classList.remove(`visually-hidden`);
+        Container.FILMS.classList.add(`visually-hidden`);
+        renderStatistic(films, getUserRank(films));
         const activeFilter = document.querySelector(`.main-navigation__item--active`);
         activeFilter.classList.remove(`main-navigation__item--active`);
         filter.element.classList.add(`main-navigation__item--active`);
@@ -218,62 +211,45 @@ const renderFilters = (container, films) => {
         filterActive.classList.remove(`main-navigation__item--active`);
       }
       filter.element.classList.add(`main-navigation__item--active`);
-      statisticBlock.classList.add(`visually-hidden`);
-      filmsBlock.classList.remove(`visually-hidden`);
+      Container.STATISTIC.classList.add(`visually-hidden`);
+      Container.FILMS.classList.remove(`visually-hidden`);
       const filteredFilms = doFilmsFiltering(films, filter.name.toLowerCase());
       amountFilmsOnMainContainer = 5;
-      if (showMoreButton.classList.contains(`visually-hidden`)) {
-        showMoreButton.classList.remove(`visually-hidden`);
+      if (Control.SHOW_MORE_BUTTON.classList.contains(`visually-hidden`)) {
+        Control.SHOW_MORE_BUTTON.classList.remove(`visually-hidden`);
       }
       renderFilmsByCategory(filteredFilms, amountFilmsOnMainContainer);
     };
   });
 };
-/*
-const updateFilters = (filtersData, films) => {
-  filtersData.forEach((filterData) => {
-    filterData.count = doFilmsFiltering(films, filterData.name.toLowerCase()).length;
-    filterData._partialUpdate();
-  });
-};*/
 
 const renderFilmsByCategory = (films) => {
-  const topFilms = films.sort((prevFilm, nextFilm) => {
-    return nextFilm.rating - prevFilm.rating;
-  }).slice(0, 2);
+  const topFilms = getFilmsTopRatings(films);
+  Container.EXTRA[0].innerHTML = ``;
+  renderFilms(Container.EXTRA[0], topFilms, false);
 
-  const mostFilms = films.sort((prevFilm, nextFilm) => {
-    return nextFilm.comments.length - prevFilm.comments.length;
-  }).slice(0, 2);
+  const mostFilms = getFilmsTopComments(films);
+  Container.EXTRA[1].innerHTML = ``;
+  renderFilms(Container.EXTRA[1], mostFilms, false);
 
   let mainFilms = films;
-
-  filmsExtraContainers[0].innerHTML = ``;
-  renderFilms(filmsExtraContainers[0], topFilms, false);
-
-  filmsExtraContainers[1].innerHTML = ``;
-  renderFilms(filmsExtraContainers[1], mostFilms, false);
-
-  mainFilmsContainer.innerHTML = ``;
-  renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer), true);
+  Container.MAIN.innerHTML = ``;
+  renderFilms(Container.MAIN, mainFilms.slice(0, amountFilmsOnMainContainer), true);
 
   const onShowMoreButtonClick = () => {
-    mainFilmsContainer.innerHTML = ``;
+    Container.MAIN.innerHTML = ``;
     amountFilmsOnMainContainer += 5;
-    renderFilms(mainFilmsContainer, mainFilms.slice(0, amountFilmsOnMainContainer));
+    renderFilms(Container.MAIN, mainFilms.slice(0, amountFilmsOnMainContainer));
     if (amountFilmsOnMainContainer === films.length) {
-      showMoreButton.classList.add(`visually-hidden`);
+      Control.SHOW_MORE_BUTTON.classList.add(`visually-hidden`);
     }
   };
-  showMoreButton.addEventListener(`click`, onShowMoreButtonClick);
+  Control.SHOW_MORE_BUTTON.addEventListener(`click`, onShowMoreButtonClick);
 };
 
 /*
 * Статистика
 * */
-
-const statisticBlock = document.querySelector(`.statistic`);
-const filmsBlock = document.querySelector(`.films`);
 
 const showNumberOfFilmsInFooter = (films) => {
   const footerStatistics = document.querySelector(`.footer__statistics p`);
@@ -285,13 +261,13 @@ const showNumberOfFilmsInFooter = (films) => {
 * */
 
 const doSearch = (evt, films) => {
-  mainFilmsContainer.innerHTML = ``;
+  Container.MAIN.innerHTML = ``;
 
   const filmsAfterSearch = films.filter((film) => {
-    return film.title.match(searchField.value);
+    return film.title.toLowerCase().match(Control.SEARCH_FIELD.value.toLowerCase());
   });
 
-  renderFilms(mainFilmsContainer, filmsAfterSearch.slice(0, amountFilmsOnMainContainer), true);
+  renderFilms(Container.MAIN, filmsAfterSearch.slice(0, amountFilmsOnMainContainer), true);
 };
 
 /*
@@ -300,10 +276,12 @@ const doSearch = (evt, films) => {
 
 api.getFilms()
   .then((films) => {
+    allFilms = films;
     renderFilmsByCategory(films, amountFilmsOnMainContainer);
-    renderFilters(filtersContainer, films);
+    renderFilters(Container.FILTERS, films);
+    getUserRank(films);
     showNumberOfFilmsInFooter(films);
-    searchField.addEventListener(`input`, function (evt) {
+    Control.SEARCH_FIELD.addEventListener(`input`, function (evt) {
       doSearch(evt, films);
     });
   });
