@@ -49,8 +49,6 @@ export default class FilmDetails extends Component {
     this.comments = data.comments;
     this.date = data.date;
 
-    this.userComments = null;
-
     this.isWatched = data.isWatched;
     this.isWatchlist = data.isWatchlist;
     this.isFavorite = data.isFavorite;
