@@ -111,8 +111,8 @@ export default (films) => {
     return acc;
   }, {});
 
-  let arrayValues = Object.values(resultGenres);
-  let mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
+  const arrayValues = Object.values(resultGenres);
+  const mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
 
   statisticTextList.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre);
   drawChart(resultGenres);

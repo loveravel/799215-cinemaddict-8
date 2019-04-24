@@ -343,7 +343,7 @@ const renderFilmsByCategory = (films) => {
   numberOfFilmsInTheMainContainer = NumberOfFilmsInTheMainContainer.START_VALUE;
   hideShowMoreButton(numberOfFilmsInTheMainContainer, films.length);
 
-  let mainFilms = films;
+  const mainFilms = films;
   Container.MAIN.innerHTML = ``;
   renderFilms(Container.MAIN, mainFilms.slice(0, numberOfFilmsInTheMainContainer), true);
 
