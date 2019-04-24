@@ -49,15 +49,19 @@ export default class FilmDetails extends Component {
     this.comments = data.comments;
     this.date = data.date;
 
+    this.userComments = null;
+
     this.isWatched = data.isWatched;
     this.isWatchlist = data.isWatchlist;
     this.isFavorite = data.isFavorite;
 
     this._onCloseButtonClick = this._onCloseButtonClick.bind(this);
     this._onClose = null;
+    this._commented = 0;
 
     this._onScoreChange = this._onScoreChange.bind(this);
     this._onCommentPosting = this._onCommentPosting.bind(this);
+    this._onCommentDelete = this._onCommentDelete.bind(this);
     this._onEscKeydown = this._onEscKeydown.bind(this);
 
     this._onAddToWatchlistClick = this._onAddToWatchlistClick.bind(this);
@@ -119,6 +123,15 @@ export default class FilmDetails extends Component {
   /* Изменение оценки фильма пользователя */
   _onScoreChange(evt) {
     this.userRating = evt.target.value;
+
+    const formData = new FormData(this._element.querySelector(`.film-details__inner`));
+    const newData = FilmDetails._processForm(formData);
+    newData.userRating = this.userRating;
+
+    if (typeof this._onClose === `function`) {
+      this._onChangeForm(newData);
+    }
+
     this.unbind();
     this._partialUpdate();
     this.bind();
@@ -128,6 +141,7 @@ export default class FilmDetails extends Component {
   _onCommentPosting(evt) {
     if (evt.keyCode === Keycode.ENTER && evt.ctrlKey) {
       evt.preventDefault();
+      this._commented++;
 
       this.comments.push({
         comment: evt.target.value,
@@ -148,6 +162,31 @@ export default class FilmDetails extends Component {
       this._partialUpdate();
       this.bind();
     }
+  }
+
+  /* Удаление последнего комментария */
+  _onCommentDelete(evt) {
+    evt.preventDefault();
+
+    if (this.getUserComments()) {
+      const commentAuthors = this.comments.map((comment) => {
+        return comment.author;
+      });
+      const lastUserCommentIndex = commentAuthors.lastIndexOf(`Me`);
+      this.comments.splice(lastUserCommentIndex, 1);
+    }
+
+    const formData = new FormData(this._element.querySelector(`.film-details__inner`));
+    const newData = FilmDetails._processForm(formData);
+    newData.comments = this.comments;
+
+    if (typeof this._onClose === `function`) {
+      this._onChangeForm(newData);
+    }
+
+    this.unbind();
+    this._partialUpdate();
+    this.bind();
   }
 
   set onChangeForm(callback) {
@@ -206,6 +245,12 @@ export default class FilmDetails extends Component {
     emotion.innerHTML = Emotion[evt.target.value];
   }
 
+  getUserComments() {
+    return this.comments.filter((comment) => {
+      return comment.author === `Me`;
+    });
+  }
+
   get template() {
     const userRating = this.userRating;
     let ratings = ``;
@@ -223,6 +268,16 @@ export default class FilmDetails extends Component {
     for (const genre of genreNames) {
       genres += `<span class="film-details__genre">${genre}</span>`;
     }
+
+    const userComments = this.getUserComments();
+
+    const watchedControl = `
+      <div class="film-details__user-rating-controls">
+        <span class="film-details__watched-status film-details__watched-status--active">
+          ${this.isWatched ? `already watched` : `will watch`}
+        </span>
+        <button class="film-details__watched-reset" type="button">undo</button>
+      </div>`;
 
     return `
     <section class="film-details">
@@ -354,10 +409,7 @@ export default class FilmDetails extends Component {
         </section>
     
         <section class="film-details__user-rating-wrap">
-          <div class="film-details__user-rating-controls">
-            <span class="film-details__watched-status film-details__watched-status--active">Already watched</span>
-            <button class="film-details__watched-reset" type="button">undo</button>
-          </div>
+          ${userComments.length ? watchedControl : ``}
     
           <div class="film-details__user-score">
             <div class="film-details__user-rating-poster">
@@ -403,6 +455,11 @@ export default class FilmDetails extends Component {
     this._element.querySelectorAll(`.film-details__emoji-item`).forEach((emotion) => {
       emotion.addEventListener(`change`, this._onEmotionChange);
     });
+
+    if (this.getUserComments().length) {
+      this._element.querySelector(`.film-details__watched-reset`)
+        .addEventListener(`click`, this._onCommentDelete);
+    }
   }
 
   unbind() {
@@ -429,10 +486,15 @@ export default class FilmDetails extends Component {
     this._element.querySelectorAll(`.film-details__emoji-item`).forEach((emotion) => {
       emotion.removeEventListener(`change`, this._onEmotionChange);
     });
+
+    if (this.getUserComments().length > 0) {
+      this._element.querySelector(`.film-details__watched-reset`)
+        .removeEventListener(`click`, this._onCommentDelete);
+    }
   }
 
   update(data) {
-    // this.userRating = data.userRating;
+    this.userRating = data.userRating;
     this.isFavorite = data.isFavorite;
     this.isWatched = data.isWatched;
     this.isWatchlist = data.isWatchlist;
