@@ -63,6 +63,7 @@ export default class FilmDetails extends Component {
     this._onAddToWatchlistClick = this._onAddToWatchlistClick.bind(this);
     this._onMarkAsWatchedClick = this._onMarkAsWatchedClick.bind(this);
     this._onMarkAsFavoriteClick = this._onMarkAsFavoriteClick.bind(this);
+    this._onEmotionChange = this._onEmotionChange.bind(this);
 
     this._onChangeForm = null;
   }
@@ -159,11 +160,9 @@ export default class FilmDetails extends Component {
       this._onClose();
     }
   }
-
   set onClose(callback) {
     this._onClose = callback;
   }
-
   _onEscKeydown(evt) {
     if (evt.keyCode === Keycode.ESC) {
       evt.preventDefault();
@@ -172,39 +171,39 @@ export default class FilmDetails extends Component {
       }
     }
   }
-
   set onEsc(callback) {
     this._onEsc = callback;
   }
 
+  /* Добавление в списки */
   _onAddToWatchlistClick() {
     if (typeof this._onAddToWatchlist === `function`) {
       this._onAddToWatchlist();
     }
   }
-
   set onAddToWatchlist(callback) {
     this._onAddToWatchlist = callback;
   }
-
   _onMarkAsWatchedClick() {
     if (typeof this._onMarkAsWatched === `function`) {
       this._onMarkAsWatched();
     }
   }
-
   set onMarkAsWatched(callback) {
     this._onMarkAsWatched = callback;
   }
-
   _onMarkAsFavoriteClick() {
     if (typeof this._onMarkAsFavorite === `function`) {
       this._onMarkAsFavorite();
     }
   }
-
   set onMarkAsFavorite(callback) {
     this._onMarkAsFavorite = callback;
+  }
+
+  _onEmotionChange(evt) {
+    const emotion = document.querySelector(`.film-details__add-emoji-label`);
+    emotion.innerHTML = Emotion[evt.target.value];
   }
 
   get template() {
@@ -400,6 +399,10 @@ export default class FilmDetails extends Component {
       .addEventListener(`click`, this._onMarkAsWatchedClick);
     this._element.querySelector(`.film-details__control-label--favorite`)
       .addEventListener(`click`, this._onMarkAsFavoriteClick);
+
+    this._element.querySelectorAll(`.film-details__emoji-item`).forEach((emotion) => {
+      emotion.addEventListener(`change`, this._onEmotionChange);
+    });
   }
 
   unbind() {
@@ -422,6 +425,10 @@ export default class FilmDetails extends Component {
       .removeEventListener(`click`, this._onMarkAsWatchedClick);
     this._element.querySelector(`.film-details__control-label--favorite`)
       .removeEventListener(`click`, this._onMarkAsFavoriteClick);
+
+    this._element.querySelectorAll(`.film-details__emoji-item`).forEach((emotion) => {
+      emotion.removeEventListener(`change`, this._onEmotionChange);
+    });
   }
 
   update(data) {
