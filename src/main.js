@@ -8,8 +8,6 @@ import Filter from './modules/filter.js';
 import API from './api.js';
 import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
-import ModelFilm from './modules/model-film.js';
-import {getFiltersData} from "./data";
 
 /*
 * Набор констант
@@ -73,6 +71,12 @@ const getUserRank = (films) => {
 
   StatisticItem.USER_RANK.innerHTML = `You rank: ${rank}!`;
   return rank;
+};
+
+/* Функция для вывода статистики о кол-ве фильмов на сайте */
+const showNumberOfFilmsInFooter = (films) => {
+  const footerStatistics = document.querySelector(`.footer__statistics p`);
+  footerStatistics.innerHTML = `${films.length} movies inside`;
 };
 
 /* Функция для определения двух самых высокорейтинговых фильмов */
@@ -246,15 +250,6 @@ const renderFilmsByCategory = (films) => {
     }
   };
   Control.SHOW_MORE_BUTTON.addEventListener(`click`, onShowMoreButtonClick);
-};
-
-/*
-* Статистика
-* */
-
-const showNumberOfFilmsInFooter = (films) => {
-  const footerStatistics = document.querySelector(`.footer__statistics p`);
-  footerStatistics.innerHTML = `${films.length} movies inside`;
 };
 
 /*
