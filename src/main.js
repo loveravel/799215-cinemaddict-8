@@ -17,6 +17,8 @@ import moment from "moment";
 const AUTHORIZATION = `Basic sdfkjXjkl324X=12d`;
 const END_POINT = `https://es8-demo-srv.appspot.com/moowle/`;
 
+const ANIMATION_TIMEOUT = 600;
+
 const Container = {
   MAIN: document.querySelector(`.films-list .films-list__container`),
   EXTRA: document.querySelectorAll(`.films-list--extra .films-list__container`),
@@ -78,7 +80,6 @@ let allFilms = [];
 
 /* Функция для тряски */
 const shake = (element) => {
-  const ANIMATION_TIMEOUT = 600;
   element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
 
   setTimeout(() => {
@@ -342,7 +343,7 @@ const renderFilmsByCategory = (films) => {
   numberOfFilmsInTheMainContainer = NumberOfFilmsInTheMainContainer.START_VALUE;
   hideShowMoreButton(numberOfFilmsInTheMainContainer, films.length);
 
-  let mainFilms = films;
+  const mainFilms = films;
   Container.MAIN.innerHTML = ``;
   renderFilms(Container.MAIN, mainFilms.slice(0, numberOfFilmsInTheMainContainer), true);
 

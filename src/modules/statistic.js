@@ -2,6 +2,8 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import * as tools from '../tools.js';
 
+const BAR_HEIGHT = 50;
+
 const statisticTextList = document.querySelector(`.statistic__text-list`);
 
 const getTemplateStatistic = (filmsData, mostPopularGenre) => {
@@ -34,7 +36,6 @@ const getTemplateStatistic = (filmsData, mostPopularGenre) => {
 
 const drawChart = (genres) => {
   const statisticCtx = document.querySelector(`.statistic__chart`);
-  const BAR_HEIGHT = 50;
   statisticCtx.height = BAR_HEIGHT * Object.values(genres).length;
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
@@ -110,8 +111,8 @@ export default (films) => {
     return acc;
   }, {});
 
-  let arrayValues = Object.values(resultGenres);
-  let mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
+  const arrayValues = Object.values(resultGenres);
+  const mostPopularGenre = Object.keys(resultGenres)[arrayValues.indexOf(Math.max(...arrayValues))];
 
   statisticTextList.innerHTML = getTemplateStatistic(watchedFilms, mostPopularGenre);
   drawChart(resultGenres);
