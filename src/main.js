@@ -45,12 +45,17 @@ const RankCount = {
   FAN: {min: 11, max: 20}
 };
 
+const NumberOfFilmsInTheMainContainer = {
+  START_VALUE: 5,
+  STEP: 5,
+};
+
 /*
 * Тело модуля
 * */
 
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
-let amountFilmsOnMainContainer = 5;
+let numberOfFilmsInTheMainContainer;
 let allFilms = [];
 
 /* Функция для получения просмотренных фильмов */
@@ -219,11 +224,10 @@ const renderFilters = (container, films) => {
       Container.STATISTIC.classList.add(`visually-hidden`);
       Container.FILMS.classList.remove(`visually-hidden`);
       const filteredFilms = doFilmsFiltering(films, filter.name.toLowerCase());
-      amountFilmsOnMainContainer = 5;
       if (Control.SHOW_MORE_BUTTON.classList.contains(`visually-hidden`)) {
         Control.SHOW_MORE_BUTTON.classList.remove(`visually-hidden`);
       }
-      renderFilmsByCategory(filteredFilms, amountFilmsOnMainContainer);
+      renderFilmsByCategory(filteredFilms);
     };
   });
 };
@@ -237,19 +241,26 @@ const renderFilmsByCategory = (films) => {
   Container.EXTRA[1].innerHTML = ``;
   renderFilms(Container.EXTRA[1], mostFilms, false);
 
+  numberOfFilmsInTheMainContainer = NumberOfFilmsInTheMainContainer.START_VALUE;
+  hideShowMoreButton(numberOfFilmsInTheMainContainer, films.length);
+
   let mainFilms = films;
   Container.MAIN.innerHTML = ``;
-  renderFilms(Container.MAIN, mainFilms.slice(0, amountFilmsOnMainContainer), true);
+  renderFilms(Container.MAIN, mainFilms.slice(0, numberOfFilmsInTheMainContainer), true);
 
   const onShowMoreButtonClick = () => {
     Container.MAIN.innerHTML = ``;
-    amountFilmsOnMainContainer += 5;
-    renderFilms(Container.MAIN, mainFilms.slice(0, amountFilmsOnMainContainer));
-    if (amountFilmsOnMainContainer === films.length) {
-      Control.SHOW_MORE_BUTTON.classList.add(`visually-hidden`);
-    }
+    numberOfFilmsInTheMainContainer += NumberOfFilmsInTheMainContainer.STEP;
+    renderFilms(Container.MAIN, mainFilms.slice(0, numberOfFilmsInTheMainContainer), true);
+    hideShowMoreButton(numberOfFilmsInTheMainContainer, films.length);
   };
   Control.SHOW_MORE_BUTTON.addEventListener(`click`, onShowMoreButtonClick);
+};
+
+const hideShowMoreButton = (filmsNow, filmsMaximum) => {
+  if (filmsNow >= filmsMaximum) {
+    Control.SHOW_MORE_BUTTON.classList.add(`visually-hidden`);
+  }
 };
 
 /*
@@ -263,7 +274,7 @@ const doSearch = (evt, films) => {
     return film.title.toLowerCase().match(Control.SEARCH_FIELD.value.toLowerCase());
   });
 
-  renderFilms(Container.MAIN, filmsAfterSearch.slice(0, amountFilmsOnMainContainer), true);
+  renderFilms(Container.MAIN, filmsAfterSearch.slice(0, numberOfFilmsInTheMainContainer), true);
 };
 
 /*
@@ -273,7 +284,7 @@ const doSearch = (evt, films) => {
 api.getFilms()
   .then((films) => {
     allFilms = films;
-    renderFilmsByCategory(films, amountFilmsOnMainContainer);
+    renderFilmsByCategory(films, numberOfFilmsInTheMainContainer);
     renderFilters(Container.FILTERS, films);
     getUserRank(films);
     showNumberOfFilmsInFooter(films);
