@@ -8,6 +8,7 @@ import Filter from './modules/filter.js';
 import API from './api.js';
 import * as data from './data.js';
 import renderStatistic from './modules/statistic.js';
+import moment from "moment";
 
 /*
 * Набор констант
@@ -22,6 +23,7 @@ const Container = {
   STATISTIC: document.querySelector(`.statistic`),
   FILMS: document.querySelector(`.films`),
   FILTERS: document.querySelector(`.main-navigation`),
+  STATISTIC_FILTERS: document.querySelector(`.statistic__filters`),
 };
 
 const Control = {
@@ -31,7 +33,18 @@ const Control = {
 
 const StatisticItem = {
   NUMBER_OF_FILMS: document.querySelector(`.footer__statistics`),
-  USER_RANK: document.querySelector(`.profile__rating`),
+  USER_RANK_HEADER: document.querySelector(`.profile__rating`),
+  USER_RANK_STATS_LABEL: document.querySelector(`.statistic__rank-label`),
+};
+
+const Statistic = {
+  FILTER_CONTAINER: document.querySelector(`.statistic__filters`),
+  FILTER_ITEM: document.querySelectorAll(`.statistic__filters-input`),
+  ALL_DAY: `all-time`,
+  TODAY: `today`,
+  WEEK: `week`,
+  MONTH: `month`,
+  YEAR: `year`,
 };
 
 const Rank = {
@@ -89,7 +102,8 @@ const getUserRank = (films) => {
     rank = Rank.MOVIE_BUFF;
   }
 
-  StatisticItem.USER_RANK.innerHTML = `You rank: ${rank}!`;
+  StatisticItem.USER_RANK_HEADER.innerHTML = `You rank: ${rank}!`;
+  StatisticItem.USER_RANK_STATS_LABEL.innerHTML = `${rank}`;
   return rank;
 };
 
@@ -236,10 +250,64 @@ const renderFilters = (container, films) => {
       const onStatsItemClick = () => {
         Container.STATISTIC.classList.remove(`visually-hidden`);
         Container.FILMS.classList.add(`visually-hidden`);
-        renderStatistic(films, getUserRank(films));
+        renderStatistic(films);
         const activeFilter = document.querySelector(`.main-navigation__item--active`);
         activeFilter.classList.remove(`main-navigation__item--active`);
         filter.element.classList.add(`main-navigation__item--active`);
+
+        const getDiffTime = (filmData) => {
+          const watchingDate = moment(filmData.watchingDate);
+          const nowDate = moment();
+          const years = nowDate.diff(watchingDate, `year`);
+          watchingDate.add(years, `years`);
+
+          const months = nowDate.diff(watchingDate, `months`);
+          watchingDate.add(months, `months`);
+
+          const days = nowDate.diff(watchingDate, `days`);
+
+          return {
+            days,
+            months,
+            years,
+          };
+        };
+
+        Statistic.FILTER_ITEM.forEach((item) => {
+          item.addEventListener(`change`, (evt) => {
+            if (evt.target.value === `all-time`) {
+              renderStatistic(films);
+            } else if (evt.target.value === `today`) {
+              renderStatistic(
+                  films.filter((film) => {
+                    const diffTime = getDiffTime(film);
+                    return diffTime.days <= 1;
+                  })
+              );
+            } else if (evt.target.value === `week`) {
+              renderStatistic(
+                  films.filter((film) => {
+                    const diffTime = getDiffTime(film);
+                    return diffTime.days <= 7;
+                  })
+              );
+            } else if (evt.target.value === `month`) {
+              renderStatistic(
+                  films.filter((film) => {
+                    const diffTime = getDiffTime(film);
+                    return diffTime.months <= 1;
+                  })
+              );
+            } else if (evt.target.value === `year`) {
+              renderStatistic(
+                  films.filter((film) => {
+                    const diffTime = getDiffTime(film);
+                    return diffTime.years <= 1;
+                  })
+              );
+            }
+          });
+        });
       };
 
       filter.element.addEventListener(`click`, onStatsItemClick);
