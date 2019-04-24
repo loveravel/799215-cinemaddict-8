@@ -50,6 +50,11 @@ const NumberOfFilmsInTheMainContainer = {
   STEP: 5,
 };
 
+const Message = {
+  LOAD_FILMS_PROCESS: `Loading moovies…`,
+  LOAD_FILMS_ERROR: `Something went wrong while loading movies. Check your connection or try again later`,
+};
+
 /*
 * Тело модуля
 * */
@@ -57,6 +62,16 @@ const NumberOfFilmsInTheMainContainer = {
 const api = new API({endPoint: END_POINT, authorization: AUTHORIZATION});
 let numberOfFilmsInTheMainContainer;
 let allFilms = [];
+
+/* Функция для тряски */
+const shake = (element) => {
+  const ANIMATION_TIMEOUT = 600;
+  element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+  setTimeout(() => {
+    element.style.animation = ``;
+  }, ANIMATION_TIMEOUT);
+};
 
 /* Функция для получения просмотренных фильмов */
 const getWatchedFilms = (films) => films.filter((it) => it.isWatched);
@@ -120,33 +135,33 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
     /* Добавление в списки */
     film.onAddToWatchlist = () => {
       filmData.isWatchlist = !filmData.isWatchlist;
-      updateData();
+      updateData(film.element);
     };
     film.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-      updateData();
+      updateData(film.element);
     };
     film.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-      updateData();
+      updateData(film.element);
     };
     filmDetails.onAddToWatchlist = () => {
       filmData.isWatchlist = !filmData.isWatchlist;
-      updateData();
+      updateData(filmDetails.element.querySelector(`.film-details__controls`));
     };
     filmDetails.onMarkAsWatched = () => {
       filmData.isWatched = !filmData.isWatched;
-      updateData();
+      updateData(filmDetails.element.querySelector(`.film-details__controls`));
     };
     filmDetails.onMarkAsFavorite = () => {
       filmData.isFavorite = !filmData.isFavorite;
-      updateData();
+      updateData(filmDetails.element.querySelector(`.film-details__controls`));
     };
 
     filmDetails.onChangeForm = (newObject) => {
       filmData.userRating = newObject.userRating;
       filmData.comments = newObject.comments;
-      updateData();
+      updateData(filmDetails.element.querySelector(`.film-details__inner`));
     };
 
     filmDetails.onClose = () => {
@@ -157,13 +172,28 @@ const renderFilms = (container, filmsData, mainBlockBool) => {
       filmDetails.unrender();
     };
 
-    const updateData = () => {
+    const updateData = (element) => {
+      /* Функция для блокировки полей при отправке комментария */
+      const block = () => {
+        element.disabled = true;
+      };
+      /* Функция для разблокировки полей при отправке комментария */
+      const unblock = () => {
+        element.disabled = false;
+      };
+      block();
+
       api.updateFilm({id: filmData.id, data: filmData.toRAW()})
         .then((newFilm) => {
+          unblock();
           film.update(newFilm);
           filmDetails.update(newFilm);
           renderFilters(Container.FILTERS, allFilms);
           getUserRank(allFilms);
+        })
+        .catch(() => {
+          shake(element);
+          unblock();
         });
     };
   }
@@ -291,4 +321,7 @@ api.getFilms()
     Control.SEARCH_FIELD.addEventListener(`input`, function (evt) {
       doSearch(evt, films);
     });
+  })
+  .catch(() => {
+    Container.FILMS.innerHTML = Message.LOAD_FILMS_ERROR;
   });
