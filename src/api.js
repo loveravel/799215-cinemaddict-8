@@ -2,9 +2,7 @@ import ModelFilm from './modules/model-film';
 
 const Method = {
   GET: `GET`,
-  POST: `POST`,
   PUT: `PUT`,
-  DELETE: `DELETE`
 };
 
 const checkStatus = (response) => {
@@ -31,17 +29,6 @@ export default class API {
       .then(ModelFilm.parseFilms);
   }
 
-  createFilm({film}) {
-    return this._load({
-      url: `movies`,
-      method: Method.POST,
-      body: JSON.stringify(film),
-      headers: new Headers({'Content-Type': `application/json`})
-    })
-      .then(toJSON)
-      .then(ModelFilm.parseFilm);
-  }
-
   updateFilm({id, data}) {
     return this._load({
       url: `movies/${id}`,
@@ -51,10 +38,6 @@ export default class API {
     })
       .then(toJSON)
       .then(ModelFilm.parseFilm);
-  }
-
-  deleteFilm({id}) {
-    return this._load({url: `movies/${id}`, method: Method.DELETE});
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {
