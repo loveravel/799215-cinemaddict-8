@@ -4,6 +4,7 @@
 
 import Component from './component';
 import * as tools from '../tools.js';
+import moment from "moment";
 
 /*
 * Набор экспортируемых значений
@@ -12,14 +13,28 @@ import * as tools from '../tools.js';
 export default class Film extends Component {
   constructor(data) {
     super();
-    this._title = data.title;
-    this._rating = data.rating;
-    this._yearOfIssue = data.date.yearOfIssue;
-    this._duration = data.duration;
-    this._genre = data.genre;
-    this._poster = data.poster;
-    this._description = data.description;
-    this._comments = data.comments;
+    this.id = data.id;
+    this.title = data.title;
+    this.altTitle = data.altTitle;
+    this.rating = data.rating;
+    this.userRating = data.userRating;
+    this.duration = data.duration;
+    this.genre = data.genre;
+    this.poster = data.poster;
+    this.description = data.description;
+    this.ageLimit = data.ageLimit;
+    this.country = data.country;
+    this.director = data.director;
+    this.writers = data.writers;
+    this.actors = data.actors;
+    this.comments = data.comments;
+    this.date = data.date;
+
+    this.isWatched = data.isWatched;
+    this.isWatchlist = data.isWatchlist;
+    this.isFavorite = data.isFavorite;
+
+    this._mainBlock = data.mainBlock;
 
     this._onDetails = null;
 
@@ -37,8 +52,8 @@ export default class Film extends Component {
     }
   }
 
-  set onDetails(fn) {
-    this._onDetails = fn;
+  set onDetails(callback) {
+    this._onDetails = callback;
   }
 
   _onAddToWatchlistClick(evt) {
@@ -48,8 +63,8 @@ export default class Film extends Component {
     }
   }
 
-  set onAddToWatchlist(fn) {
-    this._onAddToWatchlist = fn;
+  set onAddToWatchlist(callback) {
+    this._onAddToWatchlist = callback;
   }
 
   _onMarkAsWatchedClick(evt) {
@@ -59,8 +74,8 @@ export default class Film extends Component {
     }
   }
 
-  set onMarkAsWatched(fn) {
-    this._onMarkAsWatched = fn;
+  set onMarkAsWatched(callback) {
+    this._onMarkAsWatched = callback;
   }
 
   _onMarkAsFavoriteClick(evt) {
@@ -70,65 +85,74 @@ export default class Film extends Component {
     }
   }
 
-  set onMarkAsFavorite(fn) {
-    this._onMarkAsFavorite = fn;
+  set onMarkAsFavorite(callback) {
+    this._onMarkAsFavorite = callback;
   }
 
   get template() {
-    const duration = tools.getTimeFromMinutes(this._duration);
+    const duration = tools.getTimeFromMinutes(this.duration);
 
-    return `
-    <article class="film-card">
-      <h3 class="film-card__title">${this._title}</h3>
-      <p class="film-card__rating">${this._rating}</p>
-      <p class="film-card__info">
-        <span class="film-card__year">${this._yearOfIssue}</span>
-        <span class="film-card__duration">${duration.hours}h ${duration.minutes}m</span>
-        <span class="film-card__genre">${this._genre}</span>
-      </p>
-      <img src="./images/posters/${this._poster}.jpg" alt="" class="film-card__poster">
-      <p class="film-card__description">${this._description}</p>
-      <button class="film-card__comments">${this._comments.length} comments</button>
+    if (this.description.length > 140) {
+      this.description = `${this.description.substring(0, 137)}...`;
+    }
 
+    const controls = `
       <form class="film-card__controls">
         <button class="film-card__controls-item button film-card__controls-item--add-to-watchlist">Add to watchlist</button>
         <button class="film-card__controls-item button film-card__controls-item--mark-as-watched">Mark as watched</button>
         <button class="film-card__controls-item button film-card__controls-item--favorite">Mark as favorite</button>
-      </form>
+      </form>`;
+
+    return `
+    <article class="film-card">
+      <h3 class="film-card__title">${this.title}</h3>
+      <p class="film-card__rating">${this.rating}</p>
+      <p class="film-card__info">
+        <span class="film-card__year">${moment(`${this.date}`).year()}</span>
+        <span class="film-card__duration">${duration.hours}h ${duration.minutes}m</span>
+        <span class="film-card__genre">${this.genre[0]}</span>
+      </p>
+      <img src="${this.poster}" alt="" class="film-card__poster">
+      <p class="film-card__description">${this.description}</p>
+      <button class="film-card__comments">${this.comments.length} comments</button>
+      ${this._mainBlock ? controls : ``}
     </article>`.trim();
   }
 
   bind() {
     this._element.querySelector(`.film-card__comments`)
       .addEventListener(`click`, this._onCommentsButtonClick);
-    this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
-      .addEventListener(`click`, this._onAddToWatchlistClick);
-    this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
-      .addEventListener(`click`, this._onMarkAsWatchedClick);
-    this._element.querySelector(`.film-card__controls-item--favorite`)
-      .addEventListener(`click`, this._onMarkAsFavoriteClick);
+
+    if (this._mainBlock) {
+      this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
+        .addEventListener(`click`, this._onAddToWatchlistClick);
+      this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
+        .addEventListener(`click`, this._onMarkAsWatchedClick);
+      this._element.querySelector(`.film-card__controls-item--favorite`)
+        .addEventListener(`click`, this._onMarkAsFavoriteClick);
+    }
   }
 
   unbind() {
     this._element.querySelector(`.film-card__comments`)
       .removeEventListener(`click`, this._onCommentsButtonClick);
-    this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
-      .removeEventListener(`click`, this._onAddToWatchlistClick);
-    this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
-      .removeEventListener(`click`, this._onMarkAsWatchedClick);
-    this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
-      .removeEventListener(`click`, this._onMarkAsFavoriteClick);
-  }
 
-  _partialUpdate() {
-    this._element.innerHTML = this.template;
-    const newElement = this._element.parentElement.insertBefore(this._element.firstChild, this._element);
-    this._element.remove();
-    this._element = newElement;
+    if (this._mainBlock) {
+      this._element.querySelector(`.film-card__controls-item--add-to-watchlist`)
+        .removeEventListener(`click`, this._onAddToWatchlistClick);
+      this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
+        .removeEventListener(`click`, this._onMarkAsWatchedClick);
+      this._element.querySelector(`.film-card__controls-item--mark-as-watched`)
+        .removeEventListener(`click`, this._onMarkAsFavoriteClick);
+    }
   }
 
   update(data) {
-    this._comments = data.comments;
+    this.comments = data.comments;
+
+    this.isFavorite = data.isFavorite;
+    this.isWatched = data.isWatched;
+    this.isWatchlist = data.isWatchlist;
 
     this.unbind();
     this._partialUpdate();
