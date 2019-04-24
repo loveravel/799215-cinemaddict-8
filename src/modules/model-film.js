@@ -7,6 +7,7 @@ export default class ModelFilm {
     this.isFavorite = data.user_details.favorite;
     this.isWatchlist = data.user_details.watchlist;
     this.userRating = data.user_details.personal_rating || 0;
+    this.watchingDate = data.user_details.watching_date;
 
     this.actors = data.film_info.actors || [];
     this.ageLimit = data.film_info.age_rating || 0;
@@ -52,36 +53,6 @@ export default class ModelFilm {
         'favorite': this.isFavorite,
         'personal_rating': this.userRating,
         'watchlist': this.isWatchlist
-      }
-    };
-  }
-
-  static staticToRAW(data) {
-    return {
-      'id': data.id,
-      'comments': data.comments,
-      'film_info': {
-        'actors': data.actors,
-        'age_rating': data.ageLimit,
-        'alternative_title': data.altTitle,
-        'description': data.description,
-        'director': data.director,
-        'genre': [...data.genre],
-        'poster': data.poster,
-        'release': {
-          'date': data.date,
-          'release_country': data.country
-        },
-        'runtime': data.runtime,
-        'title': data.title,
-        'total_rating': data.rating,
-        'writers': [...data.writers]
-      },
-      'user_details': {
-        'already_watched': data.isWatched,
-        'favorite': data.isFavorite,
-        'personal_rating': data.userRating,
-        'watchlist': data.isWatchlist
       }
     };
   }
